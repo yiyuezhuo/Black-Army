@@ -96,6 +96,7 @@ public class RoadManagerEditor : Editor
             var render = road.GetComponent<LineRenderer>();
             render.SetPosition(0, left);
             render.SetPosition(1, right);
+            // render.SetWidth()
         }
     }
 }
