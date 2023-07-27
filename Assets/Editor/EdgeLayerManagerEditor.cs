@@ -53,7 +53,7 @@ public class EdgeLayerManagerEditor : Editor
             }
             if (!destroyAny)
             {
-                var obj = Instantiate(t.edgePrefab, t.transform);
+                var obj = Instantiate(t.edgePrefab, t.transform); // TODO: Use `PrefabUtility.InstantiatePrefab` ?
                 var render = obj.GetComponent<LineRenderer>();
                 render.positionCount = 2;
 
@@ -73,6 +73,7 @@ public class EdgeLayerManagerEditor : Editor
 
         if (GUILayout.Button("Set Z-Index"))
         {
+            Debug.Log($"Set ZIndex to {t.ZIndex}");
             Utilities.SetZIndex(t.GetComponentsInChildren<LineRenderer>(), t.ZIndex);
             // Utilities.SetZIndex();
         }
