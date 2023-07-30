@@ -18,35 +18,25 @@ public class UnityReader: YYZ.BlackArmy.Loader.ITableReader
 public class CounterCanvas : MonoBehaviour
 {
     public float confrontOffset = 0.2f;
-    public GameState state;
+    // public GameState state;
     public GameObject Counter2DPrefab;
     public GridLayout grid;
+    public GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        var data = new YYZ.BlackArmy.Loader.RawData() { reader=new UnityReader()};
-        data.Load();
-        state = data.GetGameState();
-        Sync();
+        Sync(gameManager.state);
     }
 
-    public void Sync()
+    public void Sync(GameState state)
     {
         foreach(Transform t in transform)
         {
             Destroy(t.gameObject); // TODO: Object Pooling?
         }
 
-        var hexSideStrengthMap = new Dictionary<Hex, Dictionary<Side, int>>();
-        foreach(var detachment in state.Detachments)
-        {
-            if (!hexSideStrengthMap.TryGetValue(detachment.Hex, out var sideStrenghMap))
-                sideStrenghMap = hexSideStrengthMap[detachment.Hex] = new();
-            if(!sideStrenghMap.TryGetValue(detachment.Side, out var currentStrength))
-                currentStrength = 0;
-            sideStrenghMap[detachment.Side] = currentStrength + detachment.GetTotalManpower();
-        }
+        var hexSideStrengthMap = state.GetHexSideStrengthMap();
 
         foreach((var hex, var sideStrengthMap) in hexSideStrengthMap)
         {

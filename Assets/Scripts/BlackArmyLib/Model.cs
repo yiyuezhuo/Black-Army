@@ -310,7 +310,7 @@ namespace YYZ.BlackArmy.Model
         public Side Side;
         public Hex Hex;
 
-        public Leader CurrentLeader() => Leaders.Count >= 1 ? Leaders[0] : Side.PlaceholderLeader;
+        public Leader CurrentLeader { get => Leaders.Count >= 1 ? Leaders[0] : Side.PlaceholderLeader; }
         public MovingState MovingState; // null => the unit is not moving
         public float MinSpeed() => Elements.MinSpeed();
 
@@ -424,6 +424,38 @@ namespace YYZ.BlackArmy.Model
             {
                 detachment.ResolveSubTurn();
             }
+        }
+
+        public Dictionary<Hex, Dictionary<Side, List<Detachment>>> GetHexSideDetachmentsMap()
+        {
+            var ret = new Dictionary<Hex, Dictionary<Side, List<Detachment>>>();
+
+            foreach(var detachment in Detachments)
+            {
+                if (!ret.TryGetValue(detachment.Hex, out var sideDetachmentsMap))
+                    sideDetachmentsMap = ret[detachment.Hex] = new();
+                if(!sideDetachmentsMap.TryGetValue(detachment.Side, out var detachments))
+                    detachments = sideDetachmentsMap[detachment.Side] = new();
+                detachments.Add(detachment);
+            }
+
+            return ret;
+        }
+
+        public Dictionary<Hex, Dictionary<Side, int>> GetHexSideStrengthMap()
+        {
+            var ret = new Dictionary<Hex, Dictionary<Side, int>>();
+
+            foreach (var detachment in Detachments)
+            {
+                if (!ret.TryGetValue(detachment.Hex, out var sideStrenghMap))
+                    sideStrenghMap = ret[detachment.Hex] = new();
+                if (!sideStrenghMap.TryGetValue(detachment.Side, out var currentStrength))
+                    currentStrength = 0;
+                sideStrenghMap[detachment.Side] = currentStrength + detachment.GetTotalManpower();
+            }
+
+            return ret;
         }
     }
 }

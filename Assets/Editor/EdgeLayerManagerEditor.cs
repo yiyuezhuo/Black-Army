@@ -53,7 +53,8 @@ public class EdgeLayerManagerEditor : Editor
             }
             if (!destroyAny)
             {
-                var obj = Instantiate(t.edgePrefab, t.transform); // TODO: Use `PrefabUtility.InstantiatePrefab` ?
+                // var obj = Instantiate(t.edgePrefab, t.transform); // TODO: Use `PrefabUtility.InstantiatePrefab` ?
+                var obj = PrefabUtility.InstantiatePrefab(t.edgePrefab, t.transform) as GameObject; // TODO: Use `PrefabUtility.InstantiatePrefab` ?
                 var render = obj.GetComponent<LineRenderer>();
                 render.positionCount = 2;
 
@@ -78,13 +79,22 @@ public class EdgeLayerManagerEditor : Editor
             // Utilities.SetZIndex();
         }
 
-        if (GUILayout.Button("Set Linw Width"))
+        if (GUILayout.Button("Set Line Width"))
         {
-            foreach (var render in t.GetComponentsInChildren<LineRenderer>())
+            foreach (var renderer in t.GetComponentsInChildren<LineRenderer>())
             {
-                // render.SetWidth(t.LineWidth, t.LineWidth);
-                render.startWidth = t.LineWidth;
-                render.endWidth = t.LineWidth;
+                // renderer.SetWidth(t.LineWidth, t.LineWidth);
+                renderer.startWidth = t.LineWidth;
+                renderer.endWidth = t.LineWidth;
+            }
+        }
+
+        if(GUILayout.Button("Sync Order Layer"))
+        {
+            var layerID = t.edgePrefab.GetComponent<LineRenderer>().sortingLayerID;
+            foreach(var renderer in t.GetComponentsInChildren<LineRenderer>())
+            {
+                renderer.sortingLayerID = layerID;
             }
         }
     }

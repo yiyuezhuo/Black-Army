@@ -42,6 +42,15 @@ public class RoadManagerEditor : Editor
             Utilities.SetZIndex(manager.GeneratedRoads.GetComponentsInChildren<LineRenderer>(), manager.ZIndex);
         }
 
+        if(GUILayout.Button("Sync Ordering Layer"))
+        {
+            var sortingLayerID = manager.GeneratedRoadPrefab.GetComponent<LineRenderer>().sortingLayerID;
+            foreach (var renderer in manager.GeneratedRoads.GetComponentsInChildren<LineRenderer>())
+            {
+                renderer.sortingLayerID = sortingLayerID;
+            }
+        }
+
         /*
         if(GUILayout.Button("Test"))
         {
