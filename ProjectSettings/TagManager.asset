@@ -38,8 +38,11 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
+  - name: Map
+    uniqueID: 3796993631
+    locked: 0
+  - name: Country Boundary
+    uniqueID: 1840203109
     locked: 0
   - name: River
     uniqueID: 2736295281
@@ -47,9 +50,9 @@ TagManager:
   - name: Road
     uniqueID: 525395283
     locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
   - name: Counter
     uniqueID: 2977857099
-    locked: 0
-  - name: Country Boundary
-    uniqueID: 1840203109
     locked: 0

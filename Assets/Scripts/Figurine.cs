@@ -2,11 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
-public class Figurine : MonoBehaviour // The name is borrowed from Tabletop Simulator
+using YYZ.BlackArmy.Model;
+
+public class Figurine : MonoBehaviour, IPointerClickHandler // The name is borrowed from Tabletop Simulator
 {
     public TMP_Text text;
     public UnityEngine.UI.Image image;
+
+    public Hex hex;
+    public Side side;
+
+    public UnityEvent<Hex, Side> clicked;
 
     // Start is called before the first frame update
     void Awake()
@@ -24,5 +33,11 @@ public class Figurine : MonoBehaviour // The name is borrowed from Tabletop Simu
     {
         image.sprite = sprite;
         text.text = label;
+    }
+
+    public void OnPointerClick(PointerEventData pointerEventData)
+    {
+        // Debug.Log($"{pointerEventData}, {hex}, {side}");
+        clicked.Invoke(hex, side);
     }
 }

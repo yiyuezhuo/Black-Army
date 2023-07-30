@@ -31,9 +31,16 @@ namespace YYZ.BlackArmy.Model
         // public int Battles;
     }
 
+    public class ElementCategory
+    {
+        public string Name;
+        // TODO: Use Tags
+    }
+
     public class ElementType
     {
         public string Name; // required
+        public ElementCategory Category;
         public float AllocationCoef = 1;
         public Dictionary<ElementType, float> AttachCoefMap = new(); // MachineGun is attached to infantry and cavalry
         public bool IsAttachment() => AttachCoefMap.Count > 0; // MachineGun
@@ -280,6 +287,11 @@ namespace YYZ.BlackArmy.Model
         public string Type;
         public Dictionary<Hex, Edge> EdgeMap = new();
         public List<Detachment> Detachments = new();
+
+        public override string ToString()
+        {
+            return $"Hex({X}, {Y}, {Type}, Edges:[{EdgeMap.Count}], Detachments:[{Detachments.Count}])";
+        }
     }
 
     public class MovingState
@@ -313,6 +325,11 @@ namespace YYZ.BlackArmy.Model
         public Leader CurrentLeader { get => Leaders.Count >= 1 ? Leaders[0] : Side.PlaceholderLeader; }
         public MovingState MovingState; // null => the unit is not moving
         public float MinSpeed() => Elements.MinSpeed();
+
+        public override string ToString()
+        {
+            return $"Detachment({Name}, [{Leaders.Count}], [{Elements.Elements.Count}], {Side.Name}, {Hex})";
+        }
 
         public void ResolveSubTurn()
         {
@@ -369,8 +386,10 @@ namespace YYZ.BlackArmy.Model
         public List<Side> Sides;
         public Side CurrentSide;
         
-        public DateTime BeginDateTime;
-        public DateTime CurrentDateTime{get => BeginDateTime + (Turn-1) * TimeSpan.FromDays(Turn);}
+        public DateTime BeginDateTime = new DateTime(1920, 11, 26);
+        public DateTime CurrentDateTime{get => BeginDateTime + TimeSpan.FromDays(Turn);}
+
+        public List<ElementCategory> ElementCategories;
 
         public override string ToString()
         {

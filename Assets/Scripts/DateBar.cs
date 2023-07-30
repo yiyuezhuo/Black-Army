@@ -6,33 +6,33 @@ using TMPro;
 
 public class DateBar : MonoBehaviour
 {
+    /*
     public int beginYear;
     public int beginMonth;
     public int beginDay;
 
     DateTime currentDate;
     TimeSpan stepSize = TimeSpan.FromDays(1);
+    */
+
+    public GameManager gameManager;
 
     TMP_Text text;
+
+    private void Awake()
+    {
+        text = GetComponent<TMP_Text>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        text = GetComponent<TMP_Text>();
-
-        currentDate = new DateTime(beginYear, beginMonth, beginDay);
         Sync();
     }
 
-    void Sync()
+    public void Sync()
     {
-        text.text = currentDate.ToString("dddd, dd MMMM yyyy");
-    }
-
-    public void GotoNextStep()
-    {
-        currentDate += stepSize;
-        Sync();
+        text.text = gameManager.state.CurrentDateTime.ToString("dddd, dd MMMM yyyy");
     }
 
     // Update is called once per frame

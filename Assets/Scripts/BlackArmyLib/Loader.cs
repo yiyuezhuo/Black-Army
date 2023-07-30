@@ -29,6 +29,7 @@ namespace YYZ.BlackArmy.Loader
         public List<ElementAssignmentRow> elementAssignments;
         public List<ElementAttachmentRow> elementAttachments;
         public List<SideStatsRow> sides;
+        public List<ElementCategoryRow> elementCategories;
 
         public override string ToString()
         {
@@ -47,6 +48,7 @@ namespace YYZ.BlackArmy.Loader
             elementAssignments = LoadList<ElementAssignmentRow>("Element Assignments.csv");
             elementAttachments = LoadList<ElementAttachmentRow>("Element Attachment.csv");
             sides = LoadList<SideStatsRow>("Side Stats.csv");
+            elementCategories = LoadList<ElementCategoryRow>("Element Categories");
         }
 
         public List<T> LoadList<T>(string name)
@@ -76,8 +78,10 @@ namespace YYZ.BlackArmy.Loader
         }
 
         public GameState GetGameState()
-        {   
+        {
             // First Pass: Barebone Allocation
+
+            var elementCategoryMap = elementCategories.ToDictionary(row => row.Name, row => new ElementCategory() { Name = row.Name });
 
             var hexMap = hexes.ToDictionary(row => (row.X, row.Y), row => new Hex(){
                 X=row.X, Y=row.Y, Type=row.Type
@@ -120,7 +124,8 @@ namespace YYZ.BlackArmy.Loader
             }
 
             var elementTypes = elementStats.Select(row => new ElementType(){
-                Name=row.ID, AllocationCoef=row.AllocationCoefficient,
+                Name=row.ID, Category=elementCategoryMap[row.Category],
+                AllocationCoef=row.AllocationCoefficient,
                 Fire=row.Fire, Assault=row.Assault, Defense=row.Defense,
                 // Morale=row.Morale,
                 Manpower=row.Manpower, Speed=row.Speed, TacticalSpeedModifier=row.TacticalSpeedModifier
@@ -178,7 +183,8 @@ namespace YYZ.BlackArmy.Loader
             var gameSides = sides.Select(row=>sideMap[row.ID]).ToList(); // Keep Order
             return new GameState()
             {
-                Sides=gameSides, CurrentSide=gameSides[0]
+                Sides=gameSides, CurrentSide=gameSides[0],
+                ElementCategories=elementCategories.Select(row => elementCategoryMap[row.Name]).ToList()
             };
         }
     }

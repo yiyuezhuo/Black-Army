@@ -2,15 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 using YYZ.BlackArmy.Model;
 
-public class Counter2D : MonoBehaviour
+public class Counter2D : MonoBehaviour, IPointerClickHandler
 {
     public TMP_Text text;
     public UnityEngine.UI.Image image;
 
-    // public Detachment detachment;
+    public Hex hex;
+    public Side side;
+
+    public UnityEvent<Hex, Side> clicked;
 
     // Start is called before the first frame update
     void Awake()
@@ -24,14 +29,11 @@ public class Counter2D : MonoBehaviour
         image.sprite = sprite;
     }
 
-    /*
-    void Sync()
+    public void OnPointerClick(PointerEventData pointerEventData)
     {
-        text.text = detachment.GetTotalManpower().ToString();
-        var sprite = Resources.Load<Sprite>("Flags/" + detachment.Side.Name);
-        image.sprite = sprite;
+        // Debug.Log($"{pointerEventData}, {hex}, {side}");
+        clicked.Invoke(hex, side);
     }
-    */
 
     // Update is called once per frame
     void Update()

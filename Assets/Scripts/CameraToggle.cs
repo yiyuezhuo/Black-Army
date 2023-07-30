@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class CameraToggle : MonoBehaviour
 {
-    public GameObject control1;
-    public GameObject control2;
+    public List<GameObject> toggleObjects;
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +20,7 @@ public class CameraToggle : MonoBehaviour
 
     public void Toggle(bool _)
     {
-        control1.SetActive(!control1.activeSelf);
-        control2.SetActive(!control2.activeSelf);
+        foreach (var obj in toggleObjects)
+            obj.SetActive(!obj.activeSelf);
     }
 }

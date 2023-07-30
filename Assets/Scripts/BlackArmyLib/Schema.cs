@@ -56,6 +56,7 @@ namespace YYZ.BlackArmy.Schema
     public class ElementStatRow
     {
         public string ID{get;set;}
+        public string Category { get; set; }
         public string Side{get;set;}
         public float Speed{get;set;}
 
@@ -104,5 +105,11 @@ namespace YYZ.BlackArmy.Schema
 
         [Name("Placeholder Leader Trait")]
         public string PlaceholderLeaderTrait{get;set;}
+    }
+
+    public class ElementCategoryRow
+    {
+        public string Name { get; set; }
+        public string Tags { get; set; }
     }
 }
