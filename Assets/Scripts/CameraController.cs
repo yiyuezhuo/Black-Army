@@ -10,17 +10,35 @@ public class CameraController : MonoBehaviour
     bool dragging = false;
 
     // public float MovingSpeed = 0.1f;
-    public float ZoomSpeed = 1f;
+    public float zoomSpeed = 1f;
+    public float zSpeed = 0.25f;
 
     Vector2 lastTrackedPos;
 
+    public enum ScrollMode
+    {
+        Orthographic,
+        Perspective
+    }
+
+    public ScrollMode mode;
+
     // static Vector2 mouseAdjustedCoef = new Vector2(1, -1);
     static Vector2 mouseAdjustedCoef = new Vector2(1, 1);
+
+    Vector3 initialPosition;
 
     // Start is called before the first frame update
     void Start()
     {
         cam = GetComponent<Camera>();
+        initialPosition = transform.position;
+    }
+
+    public void ResetToInitialPosition()
+    {
+        if(initialPosition != Vector3.zero)
+            transform.position = initialPosition;
     }
 
     Vector2 GetHitPoint()
@@ -43,8 +61,13 @@ public class CameraController : MonoBehaviour
     void DragHitPoint()
     {
         var newTrackedPos = GetHitPoint();
+        // Debug.Log(newTrackedPos);
         var diff = newTrackedPos - lastTrackedPos;
-        transform.Translate(-diff * mouseAdjustedCoef);
+        // Debug.Log($"Before: {transform.position}");
+        // transform.Translate(-diff * mouseAdjustedCoef);
+        var diff2 = diff * mouseAdjustedCoef;
+        transform.position = transform.position - new Vector3(diff2.x, diff2.y, 0);
+        // Debug.Log($"After: {transform.position}");
         UpdateHitPoint();
     }
 
@@ -55,11 +78,22 @@ public class CameraController : MonoBehaviour
         // Zoom
         if(Input.mouseScrollDelta.y != 0)
         {
-            var newSize = cam.orthographicSize - Input.mouseScrollDelta.y * ZoomSpeed;
-            if (newSize > 0)
+            switch(mode)
             {
-                cam.orthographicSize = newSize;
-                GetHitPoint();
+                case ScrollMode.Orthographic:
+                    var newSize = cam.orthographicSize - Input.mouseScrollDelta.y * zoomSpeed;
+                    if (newSize > 0)
+                    {
+                        cam.orthographicSize = newSize;
+                        GetHitPoint();
+                    }
+                    break;
+                case ScrollMode.Perspective:
+                    var newZ = cam.transform.position.z + Input.mouseScrollDelta.y * zSpeed;
+                    if (cam.transform.position.z * newZ < 0)
+                        break;
+                    cam.transform.position = new Vector3(cam.transform.position.x, cam.transform.position.y, newZ);
+                    break;
             }
         }
 

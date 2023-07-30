@@ -71,7 +71,7 @@ public class CounterCanvas : MonoBehaviour
     void CreateSprite(Vector3 pos, Side side, int strength)
     {
         var obj = Instantiate(Counter2DPrefab, transform);
-        obj.transform.position = pos;
+        obj.transform.localPosition = pos;
         var counter = obj.GetComponent<Counter2D>();
         var sprite = Resources.Load<Sprite>("Flags/" + side.Name);
         counter.Sync(strength.ToString(), sprite);
