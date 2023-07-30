@@ -45,6 +45,9 @@ public static class Utilities
     {
         var s = GetCsvText(rows);
         var path = EditorUtility.SaveFilePanel("Export to", "", name, "csv");
-        File.WriteAllText(path, s);
+        if (path == "")
+            Debug.Log("Cancel Save");
+        else
+            File.WriteAllText(path, s);
     }
 }

@@ -1,0 +1,15 @@
+﻿ID,Category,Side,Speed,Tactical Speed Modifier,Fire,Assault,Defense,Morale,Manpower,Allocation Coefficient
+Black Infantry,Infantry,Black,60,0.5,3,5,1,A,1,1
+Black Cavalry,Cavalry,Black,90,1,2,7,1,A,1,1.25
+Black Gun,Gun,Black,60,0.5,100,50,3,A,6,12.5
+Black Tachanka,Tachanka,Black,60,0.75,120,200,3,A,4,125
+Black Machine Gun,Machine Gun,Black,60,0.5,200,200,6,A,6,0
+Black Armored Car,Armored Car,Black,120,1,75,150,10,B,3,125
+Black Armored Train,Armored Train,Black,0,0.1,750,400,100,B,60,1000
+Red Infantry,Infantry,Red,25,1,2.5,4,1,D,1,1
+Red Cavalry,Cavalry,Red,50,1,1.5,6,1,C,1,1.25
+Red Gun,Gun,Red,40,0.5,150,60,1,D,6,12.5
+Red Tachanka,Tachanka,Red,50,0.75,100,150,3,C,4,125
+Red Machine Gun,Machine Gun,Red,40,0.5,200,200,6,D,6,0
+Red Armored Car,Armored Car,Red,120,1,100,200,3,B,3,125
+Red Armored Train,Armored Train,Red,0,0.1,1000,500,100,B,60,1000

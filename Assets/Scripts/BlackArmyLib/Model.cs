@@ -21,7 +21,11 @@ namespace YYZ.BlackArmy.Model
         public int Guerilla;
         public int Political;
 
+        public bool IsPlaceholdLeader; // PlaceholdLeader don't have kill/capture check
+
         public PersonelState State;
+
+        public Detachment Detachment;
 
         // public int Experience;
         // public int Battles;
@@ -33,18 +37,22 @@ namespace YYZ.BlackArmy.Model
         public float AllocationCoef = 1;
         public Dictionary<ElementType, float> AttachCoefMap = new(); // MachineGun is attached to infantry and cavalry
         public bool IsAttachment() => AttachCoefMap.Count > 0; // MachineGun
-        public bool Support; // Gun, ArmoredTrain
+        // public bool Support; // Gun, ArmoredTrain
         public override string ToString()
         {
             return $"ElementType({Name})";
         }
 
-        public float SoftAttack;
-        public float HardAttack;
+        public float Fire;
+        // public float HardAttack;
         public float Assault;
         public float Defense;
-        public float HitPoint=1;// Normal Infantry/Cavalry = 1, gun / tank = 0.1
-        public bool HardTarget; // armored car/train
+        // public float HitPoint=1;// Normal Infantry/Cavalry = 1, gun / tank = 0.1
+        // public bool HardTarget; // armored car/train
+        public int Morale; // A => 6, B => 5, C => 4, D => 3, E => 2, F => 1
+        public int Manpower;
+        public float Speed;
+        public float TacticalSpeedModifier;
     }
 
     public class ElementTypeSystem
@@ -66,6 +74,13 @@ namespace YYZ.BlackArmy.Model
 
         public ElementType GetType(int idx) => ElementTypes[idx];
         public ElementType GetType(string name) => Name2Type[name];
+
+        public override string ToString()
+        {
+            return $"ElementTypeSystem([{Count}])";
+        }
+
+        public int Count{get => ElementTypes.Count;}
     }
 
     public class ElementValue
@@ -84,12 +99,16 @@ namespace YYZ.BlackArmy.Model
         public ElementContainer CopyNonAttachments() => new ElementContainer(){Elements=Elements.Where(e => !e.Key.IsAttachment()).ToDictionary(KV=>KV.Key, KV=>KV.Value.Copy())};
         // public ElementContainer CopyAttachments() => new ElementContainer(){Elements=Elements.Where(e => e.Key.IsAttachment()).ToDictionary(KV=>KV.Key, KV=>KV.Value.Copy())};
 
+        public float MinSpeed() => Elements.Keys.Min(k => k.Speed);
+
         public override string ToString()
         {
             var s = string.Join(", ", Elements.Select(KV => $"{KV.Key.Name}:{KV.Value.Strength}"));
             return $"ElementContainer({s})";
             // return $"Formation(Infantry={Infantry}, Cavalry={Cavalry}, MachineGun={MachineGun}, Gun={Gun}, Tachanka={Tachanka}, ArmoredCar={ArmoredCar}, ArmoredTrain={ArmoredTrain})";
         }
+
+        public int GetTotalManpower() => Elements.Sum(KV => KV.Key.Manpower * KV.Value.Strength);
 
         public void TransferTo(ElementContainer dst, ElementType type, int strength)
         {
@@ -233,29 +252,178 @@ namespace YYZ.BlackArmy.Model
         }
     }
 
-    public class Unit
+    public class Edge
     {
-        public List<Leader> Leaders;
+        public bool River;
+        public bool Railroad;
+        public bool CountryBoundary;
+    }
 
-        public ElementContainer Elements;
+    public class Side
+    {
+        public string Name;
+        public float Morale;
+        public float VP;
+        public Leader PlaceholderLeader;
+        public List<Detachment> Detachments = new();
 
-        /*
-        static float InfantryStrengthCoef = 1f;
-        static float CavalryStrengthCoef = 1.25f;
-        static float TachankaStrengthCoef = 125f;
-        static float GunStrengthCoef = 125f;
-        static float ArmoredCarStrengthCoef = 125f;
-        static float ArmoredTrainStrengthCoef = 1000f;
-
-        static float minAllocationPercent = 0.5f;
-        static float maxAllocationPercent = 1.5f;
-        */
-
-        public void Allocate()
+        public override string ToString()
         {
+            return $"Side({Name}, {Morale}, {VP})";
+        }
+    }
 
+    public class Hex
+    {
+        public int X;
+        public int Y;
+        public string Type;
+        public Dictionary<Hex, Edge> EdgeMap = new();
+        public List<Detachment> Detachments = new();
+    }
+
+    public class MovingState
+    {
+        public Hex CurrentTarget;
+        public float CurrentCompleted;
+        public List<Hex> Waypoints; // Future waypoints, which don't include `CurrentTarget`
+        public float CurrentRemainRange{get => GameParameters.HexDistance * (1 - CurrentCompleted);}
+
+        public bool GotoNextWaypoint(out Hex update) // => end?
+        {
+            update = null;
+            if(Waypoints.Count == 0)
+                return true;
+            CurrentCompleted = 0;
+            update = CurrentTarget;
+            CurrentTarget = Waypoints[0];
+            Waypoints.RemoveAt(0);
+            return false;
+        }
+    }
+
+    public class Detachment
+    {
+        public string Name;
+        public List<Leader> Leaders = new();
+        public ElementContainer Elements = new();
+        public Side Side;
+        public Hex Hex;
+
+        public Leader CurrentLeader() => Leaders.Count >= 1 ? Leaders[0] : Side.PlaceholderLeader;
+        public MovingState MovingState; // null => the unit is not moving
+        public float MinSpeed() => Elements.MinSpeed();
+
+        public void ResolveSubTurn()
+        {
+            var minSpeed = Elements.MinSpeed();
+            if(MovingState != null)
+            {
+                var t = 1f / GameParameters.SubTurns;
+                while(t > 0)
+                {
+                    var speed = Hex.EdgeMap[MovingState.CurrentTarget].Railroad ? GameParameters.RailroadSpeed : minSpeed;
+                    var maxRange = speed * t; // TODO: Add terrain effects
+                    var remainRange = MovingState.CurrentRemainRange; // TODO: add terrain effects
+                    if(maxRange < remainRange)
+                    {
+                        MovingState.CurrentCompleted += (maxRange / remainRange);
+                        break;
+                    }
+                    var usedP = remainRange / maxRange;
+                    t = t * (1 - usedP);
+                    var isCompleted = MovingState.GotoNextWaypoint(out var update);
+                    if(update != null)
+                    {
+                        MoveTo(update);
+                    }
+                    if(isCompleted)
+                    {
+                        MovingState = null;
+                        break;
+                    }
+                }
+            }
         }
 
+        public void MoveTo(Hex dst)
+        {
+            Hex.Detachments.Remove(this);
+            Hex = dst;
+            dst.Detachments.Add(this);
+        }
 
+        public int GetTotalManpower() => Elements.GetTotalManpower() + Leaders.Count; // TODO: Add Leader?
+    }
+
+    public static class GameParameters
+    {
+        public static int SubTurns = 10;
+        public static float RailroadSpeed = 480; // 480km / day
+        public static float HexDistance = 50; // 50 km / hex
+    }
+
+    public class GameState
+    {
+        public int Turn = 1;
+        public List<Side> Sides;
+        public Side CurrentSide;
+        
+        public DateTime BeginDateTime;
+        public DateTime CurrentDateTime{get => BeginDateTime + (Turn-1) * TimeSpan.FromDays(Turn);}
+
+        public override string ToString()
+        {
+            return $"GameState({Turn}, {CurrentSide}, {CurrentDateTime})";
+        }
+
+        public IEnumerable<Detachment> Detachments
+        {
+            get
+            {
+                foreach(var side in Sides)
+                {
+                    foreach(var detachment in side.Detachments)
+                    {
+                        yield return detachment;
+                    }
+                }
+            }
+        }
+
+        public void NextPhase()
+        {
+            // Toggle side and jump to next turn on occasion.
+            var idx = Sides.IndexOf(CurrentSide);
+            if(idx >= Sides.Count - 1)
+            {
+                ResolveTurn(); // Small step WEGO system, so it looks like Real-Time
+                CurrentSide = Sides[0];
+                Turn += 1;
+            }
+            else
+            {
+                CurrentSide = Sides[idx + 1];
+            }
+        }
+
+        public void ResolveTurn()
+        {
+            // Turn Begin Processing
+
+            // Successive Sub Turn Resolv
+            for(var i=0; i<GameParameters.SubTurns; i++)
+                ResolveSubTurn();
+            
+            // Turn End Processing
+        }
+
+        public void ResolveSubTurn()
+        {
+            foreach(var detachment in Detachments)
+            {
+                detachment.ResolveSubTurn();
+            }
+        }
     }
 }

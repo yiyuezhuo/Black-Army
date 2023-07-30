@@ -76,7 +76,8 @@ public class MapExporterEditor : Editor
 
                 var testPos = worldPos + new Vector3(dx, dy, 0);
                 var testCellIdx = tilemap.WorldToCell(testPos);
-                if(cellIdx != testCellIdx)
+                var testTile = tilemap.GetTile(testCellIdx);
+                if(cellIdx != testCellIdx && testTile != null)
                 {
                     var key = (x, y, testCellIdx.x, testCellIdx.y);
                     if (!edgeMap.ContainsKey(key))
@@ -127,18 +128,6 @@ public class MapExporterEditor : Editor
 
             foreach (var key in IterHexKeyIfHas(tilemap, center + dPerp0, center + dPerp1))
                 yield return key;
-            /*
-            var cellIdx0 = tilemap.WorldToCell(center + dPerp0);
-            var cellIdx1 = tilemap.WorldToCell(center + dPerp1);
-            var tile0 = tilemap.GetTile(cellIdx0);
-            var tile1 = tilemap.GetTile(cellIdx1);
-            if (tile0 != null && tile1 != null)
-            {
-                // var key = (cellIdx0.x, cellIdx0.y, cellIdx1.x, cellIdx1.y);
-                yield return (cellIdx0.x, cellIdx0.y, cellIdx1.x, cellIdx1.y);
-                yield return (cellIdx1.x, cellIdx1.y, cellIdx0.x, cellIdx0.y);
-            }
-            */
         }
     }
 
@@ -152,20 +141,6 @@ public class MapExporterEditor : Editor
 
             foreach (var key in IterHexKeyIfHas(tilemap, p0, p1))
                 yield return key;
-            /*
-            var cellIdx0 = tilemap.WorldToCell(p0);
-            var cellIdx1 = tilemap.WorldToCell(p1);
-
-            var tile0 = tilemap.GetTile(cellIdx0);
-            var tile1 = tilemap.GetTile(cellIdx1);
-
-            if (tile0 != null && tile1 != null)
-            {
-                // var key = (cellIdx0.x, cellIdx0.y, cellIdx1.x, cellIdx1.y);
-                yield return (cellIdx0.x, cellIdx0.y, cellIdx1.x, cellIdx1.y);
-                yield return (cellIdx1.x, cellIdx1.y, cellIdx0.x, cellIdx0.y);
-            }
-            */
         }
     }
 
@@ -176,6 +151,11 @@ public class MapExporterEditor : Editor
 
         var tile0 = tilemap.GetTile(cellIdx0);
         var tile1 = tilemap.GetTile(cellIdx1);
+
+        /*
+        if ((cellIdx0.x == -19 && cellIdx0.y == 0) || (cellIdx1.x == -19 && cellIdx1.y == 0))
+            Debug.Log($"{cellIdx0}, {cellIdx1}");
+        */
 
         if (tile0 != null && tile1 != null)
         {
@@ -197,6 +177,12 @@ public class MapExporterEditor : Editor
                 {
                     yield return (x, y, cellIdx, tile);
                 }
+                /*
+                else
+                {
+                    Debug.Log($"{cellIdx} => {tile}");
+                }
+                */
             }
         }
     }
@@ -212,24 +198,6 @@ public class MapExporterEditor : Editor
             var row = new HexRow() { X = x, Y = y, Type = tile.name };
             rows.Add(row);
         }
-
-        /*
-        for (var x = tilemap.cellBounds.xMin; x < tilemap.cellBounds.xMax; x++)
-        {
-            for (var y = tilemap.cellBounds.yMin; y < tilemap.cellBounds.yMax; y++)
-            {
-                var cellIdx = new Vector3Int(x, y, 0);
-                var tile = tilemap.GetTile(cellIdx);
-                if (tile != null)
-                {
-                    var row = new HexRow() { X = x, Y = y, Type = tile.name };
-                    rows.Add(row);
-                    // var worldCoords = tilemap.CellToWorld(cellIdx); // Or call it from Grid?
-                    // Handles.Label(worldCoords, $"{cellIdx.x},{cellIdx.y}");
-                }
-            }
-        }
-        */
 
         Utilities.ExportAsCsv<HexRow>(rows, "Hexes.csv");
     }
