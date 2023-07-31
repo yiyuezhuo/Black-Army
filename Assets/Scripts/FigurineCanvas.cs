@@ -14,7 +14,7 @@ public class FigurineCanvas : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Sync(gameManager.state);
+        Sync(Provider.state);
     }
 
     // Update is called once per frame

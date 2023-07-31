@@ -33,7 +33,7 @@ namespace YYZ.BlackArmy.Loader
 
         public override string ToString()
         {
-            return $"RawData(edges=[{edges.Count}], hexes=[{hexes.Count}], detachments=[{detachments.Count}], leaders=[{leaders.Count}], traitStats=[{traitStats.Count}], elementStats=[{elementStats.Count}], leaderAssignments=[{leaderAssignments.Count}], elementAssignments=[{elementAssignments.Count}], elementAttachments=[{elementAttachments.Count}], sides=[{sides.Count}])";
+            return $"RawData(edges=[{edges.Count}], hexes=[{hexes.Count}], detachments=[{detachments.Count}], leaders=[{leaders.Count}], traitStats=[{traitStats.Count}], elementStats=[{elementStats.Count}], leaderAssignments=[{leaderAssignments.Count}], elementAssignments=[{elementAssignments.Count}], elementAttachments=[{elementAttachments.Count}], sides=[{sides.Count}], elementCategories=[{elementCategories.Count}])";
         }
 
         public void Load()
@@ -46,9 +46,9 @@ namespace YYZ.BlackArmy.Loader
             elementStats = LoadList<ElementStatRow>("Element Stats.csv");
             leaderAssignments = LoadList<LeaderAssignmentRow>("Leader Assignments.csv");
             elementAssignments = LoadList<ElementAssignmentRow>("Element Assignments.csv");
-            elementAttachments = LoadList<ElementAttachmentRow>("Element Attachment.csv");
+            elementAttachments = LoadList<ElementAttachmentRow>("Element Attachments.csv");
             sides = LoadList<SideStatsRow>("Side Stats.csv");
-            elementCategories = LoadList<ElementCategoryRow>("Element Categories");
+            elementCategories = LoadList<ElementCategoryRow>("Element Categories.csv");
         }
 
         public List<T> LoadList<T>(string name)
@@ -73,7 +73,7 @@ namespace YYZ.BlackArmy.Loader
             leader.Strategic = row.Strategic;
             leader.Operational = row.Operational;
             leader.Tactical = row.Tactical;
-            leader.Guerilla = row.Guerrilla;
+            leader.Guerrilla = row.Guerrilla;
             leader.Political = row.Political;
         }
 
@@ -81,7 +81,7 @@ namespace YYZ.BlackArmy.Loader
         {
             // First Pass: Barebone Allocation
 
-            var elementCategoryMap = elementCategories.ToDictionary(row => row.Name, row => new ElementCategory() { Name = row.Name });
+            var elementCategoryMap = elementCategories.ToDictionary(row => row.Name, row => new ElementCategory() { Name = row.Name , Priority =row.Priority });
 
             var hexMap = hexes.ToDictionary(row => (row.X, row.Y), row => new Hex(){
                 X=row.X, Y=row.Y, Type=row.Type
@@ -184,7 +184,8 @@ namespace YYZ.BlackArmy.Loader
             return new GameState()
             {
                 Sides=gameSides, CurrentSide=gameSides[0],
-                ElementCategories=elementCategories.Select(row => elementCategoryMap[row.Name]).ToList()
+                ElementCategories=elementCategories.Select(row => elementCategoryMap[row.Name]).ToList(),
+                ElementTypeSystem=elementSystem
             };
         }
     }

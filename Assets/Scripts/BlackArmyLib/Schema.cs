@@ -111,5 +111,6 @@ namespace YYZ.BlackArmy.Schema
     {
         public string Name { get; set; }
         public string Tags { get; set; }
+        public int Priority { get; set; }
     }
 }

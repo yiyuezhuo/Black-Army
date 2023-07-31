@@ -1,8 +1,8 @@
-﻿Name,Tags
-Infantry,
-Cavalry,
-Tachanka,Vehicle
-Gun,
-Armored Car,Vehicle
-Armored Train,Vehicle
-Machine Gun,
+﻿Name,Tags,Priority
+Infantry,,0
+Cavalry,,1
+Tachanka,Vehicle,2
+Gun,,3
+Armored Car,Vehicle,4
+Armored Train,Vehicle,5
+Machine Gun,,6

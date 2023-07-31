@@ -26,7 +26,7 @@ public class CounterCanvas : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Sync(gameManager.state);
+        Sync(Provider.state);
     }
 
     public void Sync(GameState state)

@@ -15,7 +15,7 @@ public class DateBar : MonoBehaviour
     TimeSpan stepSize = TimeSpan.FromDays(1);
     */
 
-    public GameManager gameManager;
+    // public GameManager gameManager;
 
     TMP_Text text;
 
@@ -32,7 +32,7 @@ public class DateBar : MonoBehaviour
 
     public void Sync()
     {
-        text.text = gameManager.state.CurrentDateTime.ToString("dddd, dd MMMM yyyy");
+        text.text = Provider.state.CurrentDateTime.ToString("dddd, dd MMMM yyyy");
     }
 
     // Update is called once per frame

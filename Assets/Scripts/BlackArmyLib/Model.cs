@@ -18,7 +18,7 @@ namespace YYZ.BlackArmy.Model
         public int Strategic;
         public int Operational;
         public int Tactical;
-        public int Guerilla;
+        public int Guerrilla;
         public int Political;
 
         public bool IsPlaceholdLeader; // PlaceholdLeader don't have kill/capture check
@@ -35,6 +35,7 @@ namespace YYZ.BlackArmy.Model
     {
         public string Name;
         // TODO: Use Tags
+        public int Priority;
     }
 
     public class ElementType
@@ -47,7 +48,7 @@ namespace YYZ.BlackArmy.Model
         // public bool Support; // Gun, ArmoredTrain
         public override string ToString()
         {
-            return $"ElementType({Name})";
+            return $"ElementType({Name}, {Category.Name}, AllocationCoef={AllocationCoef}, AttachCoefMap=[{AttachCoefMap.Count}], {IsAttachment()})";
         }
 
         public float Fire;
@@ -69,7 +70,7 @@ namespace YYZ.BlackArmy.Model
         public ElementTypeSystem(IEnumerable<ElementType> types)
         {
             ElementTypes = types.ToList();
-            Name2Type = types.ToDictionary(t => t.Name, t => t);
+            Name2Type = ElementTypes.ToDictionary(t => t.Name, t => t);
         }
         public IEnumerable<ElementType> IterNonAttachments() => ElementTypes.Where(e => !e.IsAttachment());
         public IEnumerable<ElementType> IterAttachments() => ElementTypes.Where(e => e.IsAttachment());
@@ -390,6 +391,7 @@ namespace YYZ.BlackArmy.Model
         public DateTime CurrentDateTime{get => BeginDateTime + TimeSpan.FromDays(Turn);}
 
         public List<ElementCategory> ElementCategories;
+        public ElementTypeSystem ElementTypeSystem;
 
         public override string ToString()
         {

@@ -5,7 +5,7 @@ using TMPro;
 
 public class CurrentPlayerIndicator : MonoBehaviour
 {
-    public GameManager gameManager;
+    // public GameManager gameManager;
     TMP_Text text;
 
     // Start is called before the first frame update
@@ -17,7 +17,7 @@ public class CurrentPlayerIndicator : MonoBehaviour
 
     public void Sync()
     {
-        text.text = $"Current Side: {gameManager.state.CurrentSide.Name}";
+        text.text = $"Current Side: {Provider.state.CurrentSide.Name}";
     }
 
     // Update is called once per frame

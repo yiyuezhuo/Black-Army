@@ -7,7 +7,7 @@ using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
-    public GameState state;
+    GameState state;
 
     public UnityEvent stepped;
     public UnityEvent newTurnArrived;

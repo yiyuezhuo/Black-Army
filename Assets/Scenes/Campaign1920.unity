@@ -45568,7 +45568,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e157c51d3b63cd243af46d09c2a8e53f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 1787925096}
 --- !u!1 &1390113825
 GameObject:
   m_ObjectHideFlags: 0
@@ -56173,7 +56172,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 526628922}
         m_TargetAssemblyTypeName: UnitBar, Assembly-CSharp
-        m_MethodName: Sync
+        m_MethodName: OnDetachmentSelected
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -61842,7 +61841,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34c6267752150c14c89e98194b185b16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 1787925096}
 --- !u!1 &1930482025
 GameObject:
   m_ObjectHideFlags: 0
