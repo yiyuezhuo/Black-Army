@@ -94,9 +94,18 @@ namespace YYZ.BlackArmy.Loader
                 src.EdgeMap[dst] = new Edge(){River=edgeRow.River, Railroad=edgeRow.Railroad, CountryBoundary=edgeRow.CountryBoundary};
             }
 
+            
             var sideMap = sides.ToDictionary(row => row.ID, row => new Side(){
-                Name=row.ID, Morale=row.Morale, VP=row.VP
+                Name=row.ID, Morale=row.Morale, VP=row.VP, RailroadMovementAvailable=row.Tags.Contains("Railroad Movement")
             });
+            
+            /*
+            var sideMap = new Dictionary<string, Side>();
+            foreach(var row in sides)
+            {
+                var tags = row.Tags.Split()
+            }
+            */
 
             var detachmentMap = detachments.ToDictionary(row => row.ID, row => new Detachment(){
                 Name=row.ID, Side=sideMap[row.Side], Hex=hexMap[(row.X, row.Y)]

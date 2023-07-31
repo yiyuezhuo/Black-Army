@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     {
         var turnBefore = state.Turn;
         state.NextPhase();
+        OnStepped();
         stepped.Invoke();
         if (state.Turn != turnBefore)
         {
@@ -42,6 +43,11 @@ public class GameManager : MonoBehaviour
     }
 
     void OnNewTurnArrived()
+    {
+        Provider.Message($"New Turn: {state.Turn}");
+    }
+
+    void OnStepped()
     {
         currentDetachment = null;
         detachmentDeselected.Invoke(); // TODO: refactor
@@ -64,7 +70,12 @@ public class GameManager : MonoBehaviour
     public void stackClicked(Hex hex, Side side)
     {
         // Debug.Log($"stackClicked({hex}, {side})");
-        // TODO: Block non-current selection here?
+
+        if (side != state.CurrentSide) // Block non-current selection
+        {
+            Provider.Message($"Can't issue orders to {side.Name} units since the current side is {state.CurrentSide.Name}");
+            return;
+        }
 
         var currentSideStack = hex.Detachments.Where(d => d.Side == side).ToList();
         currentSelectingIdx = hex == lastSelectedHex ? (currentSelectingIdx + 1) % currentSideStack.Count : 0;
@@ -94,14 +105,20 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        var graph = new HexGraph();
+        var graph = new HexGraph() { detachment=currentDetachment};
         var path = YYZ.PathFinding.PathFinding<Hex>.AStar(graph, currentDetachment.Hex, hex);
 
         var s = string.Join(',', path.Select(hex => hex.ToString()));
         Debug.Log($"path=[{path.Count}]:{s}");
 
         if (path.Count < 2)
+        {
+            Provider.Message("Not reachable");
             return;
+        }
+
+        // Provider.Message($"Set Path:{path.Count}");
+        Provider.Message("");
 
         var currentTarget = path[1];
         var waypoints = path.Skip(2).ToList();
@@ -119,7 +136,9 @@ public class GameManager : MonoBehaviour
 
 public class HexGraph: YYZ.PathFinding.IGraph<Hex>
 {
-    public float MoveCost(Hex src, Hex dst) => src.EdgeMap[dst].Railroad ? 1 : 10; // TODO: We should use different graph for graph unit type but for now we just use a simple graph due to time budget.
+    public Detachment detachment;
+
+    public float MoveCost(Hex src, Hex dst) => detachment.Side.RailroadMovementAvailable && src.EdgeMap[dst].Railroad ? 1 : 10; // TODO: We should use different graph for graph unit type but for now we just use a simple graph due to time budget.
     public float EstimateCost(Hex src, Hex dst)
     {
         var dx = src.X - dst.X;

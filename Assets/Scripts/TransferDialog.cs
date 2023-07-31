@@ -18,6 +18,7 @@ public class TransferDialog : MonoBehaviour
     // public GameManager gameManager;
 
     public UnityEvent detachmentsChanged;
+    public UnityEvent<Detachment> transferCompleted;
 
     Detachment currentDetachment;
     Detachment dummy;
@@ -147,6 +148,8 @@ public class TransferDialog : MonoBehaviour
 
         if(changed)
             detachmentsChanged.Invoke();
+
+        transferCompleted.Invoke(currentDetachment);
     }
 
     public void OnCancel()

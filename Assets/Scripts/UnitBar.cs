@@ -43,19 +43,52 @@ public class UnitBar : MonoBehaviour
         detachmentLeaderImage.GetComponent<DetachmentLeaderImage>().leader = leader;
 
         SyncStrengthContainer(detachment);
-        
+
         commanderNameText.text = leader.Name;
         commanderStrategicText.text = $"Strategic: {leader.Strategic}";
         commanderOperationalText.text = $"Operational: {leader.Operational}";
         commanderGuerrillaText.text = $"Guerrilla: {leader.Guerrilla}";
         commanderTacticalText.text = $"Tactical: {leader.Tactical}";
 
-        statesText.text = "";
+        SyncStates(detachment);
 
         var tacticalSum = detachment.Leaders.Sum(l => l.Tactical);
         commandersStatsText.text = $"{detachment.Leaders.Count} Commanders, tactical sum:{tacticalSum}, modifier:+0%";
 
         SyncSubCommanderContainer(detachment);
+    }
+
+    public void SyncStates(Detachment detachment)
+    {
+        // statesText.text = "";
+
+        var hex = detachment.Hex;
+        var ms = detachment.MovingState;
+
+        List<string> texts = new();
+        if (ms == null)
+        {
+            texts.Add($"Idle in ({hex.X},{hex.Y})");
+        }
+        else
+        {
+            // detachment.MovingState
+            texts.AddRange(new List<string>
+            {
+                $"Current Speed: {detachment.RealSpeed()}km/day",
+                $"Moving from ({detachment.Hex.X},{detachment.Hex.Y}) to ({ms.CurrentTarget.X},{ms.CurrentTarget.Y})",
+                $"Completed: {ms.CurrentCompleted.ToString("P")}",
+                $"Final Destination: ({ms.FinalTarget.X},{ms.FinalTarget.Y})"
+            });
+        }
+        texts.Add("Ammo: 100%"); // TODO: Add ammo update
+        statesText.text = string.Join("\n", texts);
+    }
+
+    public void OnCurrentDetachmentMovingStateChanged(Detachment detachment)
+    {
+        if(gameObject.activeSelf)
+            SyncStates(detachment); 
     }
 
     public void OnDetachmentSelected(Detachment detachment)
@@ -75,6 +108,17 @@ public class UnitBar : MonoBehaviour
             var text = obj.GetComponent<TMP_Text>();
             text.text = $"{category.Name}: {strength}";
         }
+    }
+
+    public void OnDetachmentUnselected() => gameObject.SetActive(false);
+    public void OnTransferCompleted(Detachment detachment)
+    {
+        if(detachment.IsEmpty())
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+        Sync(detachment);
     }
 
     void SyncSubCommanderContainer(Detachment detachment)

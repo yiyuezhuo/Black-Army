@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using YYZ.BlackArmy.Model;
-using UnityEngine.Events;
+// using UnityEngine.Events;
 using System.Linq;
+using System;
 
 public static class Helpers
 {
@@ -61,5 +62,18 @@ public static class Provider
     public static Hex GetHex(int x, int y) => hexMap[(x, y)];
     public static Hex GetHex((int, int) xy) => hexMap[xy];
 
-    static UnityEvent testEvent;
+    
+    public static void Message(string s)
+    {
+        messaged?.Invoke(null, s);
+    }
+
+    public static void OpenWiki(string url)
+    {
+        tryOpenWiki?.Invoke(null, url);
+    }
+
+    // public static UnityEvent<string> messaged;
+    public static event EventHandler<string> messaged;
+    public static event EventHandler<string> tryOpenWiki;
 }

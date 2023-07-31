@@ -11,6 +11,8 @@ public class FigurineCanvas : MonoBehaviour
     public GameObject FigurinePrefab;
     public GridLayout grid;
 
+    // public Vector3 figurineOffset = new Vector3();
+
     // Start is called before the first frame update
     void Start()
     {

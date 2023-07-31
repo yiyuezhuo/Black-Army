@@ -25,5 +25,6 @@ public class SubLeaderImage : MonoBehaviour, IPointerClickHandler
         Debug.Log($"{pointerEventData}, {leader}");
         // leader.Wiki
         // Application.OpenURL(leader.Wiki);
+        Provider.OpenWiki(leader.Wiki);
     }
 }

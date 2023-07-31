@@ -24,6 +24,8 @@ public class DetachmentLeaderImage : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         Debug.Log($"{pointerEventData}, {leader}");
+        // Application.OpenURL(leader.Wiki);
+        Provider.OpenWiki(leader.Wiki);
     }
 
 }

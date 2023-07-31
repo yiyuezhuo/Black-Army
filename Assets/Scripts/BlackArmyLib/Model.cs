@@ -290,10 +290,11 @@ namespace YYZ.BlackArmy.Model
         public float VP;
         public Leader PlaceholderLeader;
         public List<Detachment> Detachments = new();
+        public bool RailroadMovementAvailable;
 
         public override string ToString()
         {
-            return $"Side({Name}, {Morale}, {VP})";
+            return $"Side({Name}, {Morale}, {VP}, RailroadMovementAvailable={RailroadMovementAvailable})";
         }
     }
 
@@ -316,7 +317,7 @@ namespace YYZ.BlackArmy.Model
         public Hex CurrentTarget;
         public float CurrentCompleted;
         public List<Hex> Waypoints; // Future waypoints, which don't include `CurrentTarget`
-        public float CurrentRemainRange{get => GameParameters.HexDistance * (1 - CurrentCompleted);}
+        public float CurrentRemainRange { get => GameParameters.HexDistance * (1 - CurrentCompleted); }
 
         public bool GotoNextWaypoint() // => end?
         {
@@ -327,6 +328,8 @@ namespace YYZ.BlackArmy.Model
             Waypoints.RemoveAt(0);
             return false;
         }
+
+        public Hex FinalTarget{ get => Waypoints.Count > 0 ? Waypoints[Waypoints.Count - 1] : CurrentTarget; }
     }
 
     public class Detachment
@@ -340,6 +343,8 @@ namespace YYZ.BlackArmy.Model
         public Leader CurrentLeader { get => Leaders.Count >= 1 ? Leaders[0] : Side.PlaceholderLeader; }
         public MovingState MovingState; // null => the unit is not moving
         public float MinSpeed() => Elements.MinSpeed();
+        public float RealSpeed() => RealSpeed(MinSpeed());
+        public float RealSpeed(float minSpeed) => Side.RailroadMovementAvailable && Hex.EdgeMap[MovingState.CurrentTarget].Railroad ? GameParameters.RailroadSpeed : minSpeed;
 
         public override string ToString()
         {
@@ -354,7 +359,7 @@ namespace YYZ.BlackArmy.Model
                 var t = 1f / GameParameters.SubTurns;
                 while(t > 0)
                 {
-                    var speed = Hex.EdgeMap[MovingState.CurrentTarget].Railroad ? GameParameters.RailroadSpeed : minSpeed;
+                    var speed = RealSpeed(minSpeed);
                     var maxRange = speed * t; // TODO: Add terrain effects
                     var remainRange = MovingState.CurrentRemainRange; // TODO: add terrain effects
                     if(maxRange < remainRange)

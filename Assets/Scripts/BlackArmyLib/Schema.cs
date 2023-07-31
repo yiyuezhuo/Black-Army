@@ -105,6 +105,7 @@ namespace YYZ.BlackArmy.Schema
 
         [Name("Placeholder Leader Trait")]
         public string PlaceholderLeaderTrait{get;set;}
+        public string Tags { get; set; }
     }
 
     public class ElementCategoryRow
