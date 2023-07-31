@@ -24,6 +24,7 @@ public class UnitBar : MonoBehaviour
     public GameObject commanderPanelPrefab;
 
     public UnityEvent<Detachment> detachmentTransferred;
+    public UnityEvent closed;
 
     Detachment currentDetachment;
 
@@ -90,7 +91,12 @@ public class UnitBar : MonoBehaviour
         }
     }
 
-    public void Close() => gameObject.SetActive(false);
+    public void Close()
+    {
+        closed.Invoke();
+        gameObject.SetActive(false);
+    }
+
     public void OpenWiki()
     {
         Debug.Log("OpenWiki");

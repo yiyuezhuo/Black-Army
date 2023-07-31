@@ -29,6 +29,8 @@ public class FigurineCanvas : MonoBehaviour
             Sync();
     }
 
+    public void OnNewTurnArrived() => OnDetachmentsChanged();
+
     public void Sync()
     {
         var state = Provider.state;

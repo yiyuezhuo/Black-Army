@@ -43,6 +43,8 @@ public static class Helpers
 public static class Provider
 {
     public static GameState state;
+    static Dictionary<(int, int), Hex> hexMap;
+
     static Provider()
     {
         var data = new YYZ.BlackArmy.Loader.RawData() { reader = new UnityReader() };
@@ -51,9 +53,13 @@ public static class Provider
         Debug.Log(data);
 
         state = data.GetGameState();
+        hexMap = state.Hexes.ToDictionary(hex => (hex.X, hex.Y));
 
         Debug.Log(state);
     }
+
+    public static Hex GetHex(int x, int y) => hexMap[(x, y)];
+    public static Hex GetHex((int, int) xy) => hexMap[xy];
 
     static UnityEvent testEvent;
 }

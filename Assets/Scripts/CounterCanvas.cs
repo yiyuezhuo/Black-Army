@@ -66,6 +66,8 @@ public class CounterCanvas : MonoBehaviour
             Sync();
     }
 
+    public void OnNewTurnArrived() => OnDetachmentsChanged();
+
     void CreateSprite(Vector3 pos, Hex hex, Side side, int strength)
     {
         var obj = Instantiate(Counter2DPrefab, transform);

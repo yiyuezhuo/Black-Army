@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
+using UnityEngine;
 
 namespace YYZ.BlackArmy.Model
 {
@@ -317,13 +318,11 @@ namespace YYZ.BlackArmy.Model
         public List<Hex> Waypoints; // Future waypoints, which don't include `CurrentTarget`
         public float CurrentRemainRange{get => GameParameters.HexDistance * (1 - CurrentCompleted);}
 
-        public bool GotoNextWaypoint(out Hex update) // => end?
+        public bool GotoNextWaypoint() // => end?
         {
-            update = null;
-            if(Waypoints.Count == 0)
-                return true;
             CurrentCompleted = 0;
-            update = CurrentTarget;
+            if (Waypoints.Count == 0)
+                return true;
             CurrentTarget = Waypoints[0];
             Waypoints.RemoveAt(0);
             return false;
@@ -365,11 +364,9 @@ namespace YYZ.BlackArmy.Model
                     }
                     var usedP = remainRange / maxRange;
                     t = t * (1 - usedP);
-                    var isCompleted = MovingState.GotoNextWaypoint(out var update);
-                    if(update != null)
-                    {
-                        MoveTo(update);
-                    }
+                    MoveTo(MovingState.CurrentTarget);
+
+                    var isCompleted = MovingState.GotoNextWaypoint();
                     if(isCompleted)
                     {
                         MovingState = null;
@@ -408,10 +405,11 @@ namespace YYZ.BlackArmy.Model
     {
         public int Turn = 1;
         public List<Side> Sides;
+        public List<Hex> Hexes;
         public Side CurrentSide;
         
         public DateTime BeginDateTime = new DateTime(1920, 11, 26);
-        public DateTime CurrentDateTime{get => BeginDateTime + TimeSpan.FromDays(Turn);}
+        public DateTime CurrentDateTime{get => BeginDateTime + TimeSpan.FromDays(Turn - 1);}
 
         public List<ElementCategory> ElementCategories;
         public ElementTypeSystem ElementTypeSystem;

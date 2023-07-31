@@ -179,6 +179,7 @@ namespace YYZ.BlackArmy.Loader
             return new GameState()
             {
                 Sides=gameSides, CurrentSide=gameSides[0],
+                Hexes=hexMap.Values.ToList(),
                 ElementCategories=elementCategories.Select(row => elementCategoryMap[row.Name]).ToList(),
                 ElementTypeSystem=elementSystem
             };

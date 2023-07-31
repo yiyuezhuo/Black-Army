@@ -53,6 +53,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Move Path
+    uniqueID: 1756557055
+    locked: 0
   - name: Counter
     uniqueID: 2977857099
     locked: 0
