@@ -104,17 +104,12 @@ namespace YYZ.BlackArmy.Loader
 
             var traitMap = traitStats.ToDictionary(row => row.ID);
             
-            /*
-            var leaderMap = leaders.ToDictionary(row => row.ID, row => new Leader(){
-                Name=row.ID, Strategic=traitMap[row.MilitaryTrait].Strategic,
-            });
-            */
             var leaderMap = new Dictionary<string, Leader>();
             foreach(var row in leaders)
             {
                 var leader = leaderMap[row.ID] = new Leader()
                 {
-                    Name=row.ID,
+                    Name=row.ID, Wiki=row.Wiki
                 };
                 if(row.MilitaryTrait != "")
                 {

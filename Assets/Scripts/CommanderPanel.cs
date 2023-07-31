@@ -27,6 +27,8 @@ public class CommanderPanel : MonoBehaviour
             var s = string.Join(",", csList.Select(cs => $"{cs.Item2} {cs.Item1.Name}"));
             commandingStrengthText.text = $"Commanding {s}";
         }
+
+        portrait.GetComponent<SubLeaderImage>().leader = leader;
     }
 
     // Start is called before the first frame update

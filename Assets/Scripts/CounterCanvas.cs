@@ -26,12 +26,14 @@ public class CounterCanvas : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Sync(Provider.state);
+        Sync();
     }
 
-    public void Sync(GameState state)
+    public void Sync()
     {
-        foreach(Transform t in transform)
+        var state = Provider.state;
+
+        foreach (Transform t in transform)
         {
             Destroy(t.gameObject); // TODO: Object Pooling?
         }
@@ -56,6 +58,12 @@ public class CounterCanvas : MonoBehaviour
                 CreateSprite(center - new Vector3(0, confrontOffset, 0), hex, side, strength);
             }
         }
+    }
+
+    public void OnDetachmentsChanged()
+    {
+        if(gameObject.activeSelf)
+            Sync();
     }
 
     void CreateSprite(Vector3 pos, Hex hex, Side side, int strength)

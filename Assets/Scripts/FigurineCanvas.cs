@@ -14,7 +14,7 @@ public class FigurineCanvas : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Sync(Provider.state);
+        Sync();
     }
 
     // Update is called once per frame
@@ -23,9 +23,17 @@ public class FigurineCanvas : MonoBehaviour
         
     }
 
-    public void Sync(GameState state)
+    public void OnDetachmentsChanged()
     {
-        foreach(Transform t in transform)
+        if (gameObject.activeSelf)
+            Sync();
+    }
+
+    public void Sync()
+    {
+        var state = Provider.state;
+
+        foreach (Transform t in transform)
             Destroy(t.gameObject);
 
         var hexSideDetachmentsMap = state.GetHexSideDetachmentsMap();
@@ -55,11 +63,6 @@ public class FigurineCanvas : MonoBehaviour
         var detachment = detachments[0];
 
         var leader = detachment.CurrentLeader;
-        /*
-        var portrait = Resources.Load<Sprite>($"Leaders/{detachment.Side.Name}/{leader.Name}");
-        if (portrait == null)
-            portrait = Resources.Load<Sprite>($"Flags/{detachment.Side.Name}");
-        */
         var portrait = Helpers.GetSprite(leader, side);
 
         var text = $"{detachment.GetTotalManpower()}";

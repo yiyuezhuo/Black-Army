@@ -21,6 +21,8 @@ namespace YYZ.BlackArmy.Model
         public int Guerrilla;
         public int Political;
 
+        public string Wiki; // TODO: Lift it from the model?
+
         public bool IsPlaceholdLeader; // PlaceholdLeader don't have kill/capture check
 
         public PersonelState State;
@@ -29,6 +31,10 @@ namespace YYZ.BlackArmy.Model
 
         // public int Experience;
         // public int Battles;
+        public override string ToString()
+        {
+            return $"Leader({Name})";
+        }
     }
 
     public class ElementCategory
@@ -150,6 +156,15 @@ namespace YYZ.BlackArmy.Model
                 return value.Strength > 0;
             }
             return false;
+        }
+
+        public int StrengthOf(ElementType type)
+        {
+            if(Elements.TryGetValue(type, out var value))
+            {
+                return value.Strength;
+            }
+            return 0;
         }
 
         public IEnumerable<ElementContainer> DivideNonAttachment(ElementTypeSystem system, int n, float minThreshold, float maxThreshold)
@@ -372,6 +387,14 @@ namespace YYZ.BlackArmy.Model
         }
 
         public int GetTotalManpower() => Elements.GetTotalManpower() + Leaders.Count; // TODO: Add Leader?
+
+        public void TransferTo(Detachment dst, Leader leader)
+        {
+            Leaders.Remove(leader);
+            dst.Leaders.Add(leader);
+        }
+
+        public bool IsEmpty() => Leaders.Count == 0 && Elements.Elements.Count == 0;
     }
 
     public static class GameParameters

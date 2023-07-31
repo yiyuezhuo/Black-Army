@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using YYZ.BlackArmy.Model;
 using System.Linq;
+using UnityEngine.Events;
 
 public class UnitBar : MonoBehaviour
 {
@@ -22,18 +23,26 @@ public class UnitBar : MonoBehaviour
     public GameObject categoryStrengthItemPrefab;
     public GameObject commanderPanelPrefab;
 
+    public UnityEvent<Detachment> detachmentTransferred;
+
+    Detachment currentDetachment;
+
     public void Sync(Detachment detachment)
     {
-        gameObject.SetActive(true);
+        // gameObject.SetActive(true);
 
         // Debug.Log($"UnitBar sync: {detachment}");
+
+        currentDetachment = detachment;
 
         detachmentNameText.text = detachment.Name;
         detachmentLeaderImage.sprite = Helpers.GetSprite(detachment);
 
-        SyncStrengthContainer(detachment);
-
         var leader = detachment.CurrentLeader;
+        detachmentLeaderImage.GetComponent<DetachmentLeaderImage>().leader = leader;
+
+        SyncStrengthContainer(detachment);
+        
         commanderNameText.text = leader.Name;
         commanderStrategicText.text = $"Strategic: {leader.Strategic}";
         commanderOperationalText.text = $"Operational: {leader.Operational}";
@@ -58,22 +67,6 @@ public class UnitBar : MonoBehaviour
     {
         foreach (Transform t in strengthContainer.transform)
             Destroy(t.gameObject);
-
-        /*
-        var categoryStrengthMap = Provider.state.ElementCategories.ToDictionary(c => c, c => 0);
-
-        foreach ((var elementType, var elementValue) in detachment.Elements.Elements)
-        {
-            categoryStrengthMap[elementType.Category] += elementValue.Strength;
-        }
-
-        foreach (var category in Provider.state.ElementCategories)
-        {
-            var obj = Instantiate(categoryStrengthItemPrefab, strengthContainer.transform);
-            var text = obj.GetComponent<TMP_Text>();
-            text.text = $"{category.Name}:{categoryStrengthMap[category]}";
-        }
-        */
 
         foreach((var category, var strength) in Helpers.GetElementCategoryStrength(detachment.Elements))
         {
@@ -110,12 +103,13 @@ public class UnitBar : MonoBehaviour
 
     public void OnTransfer()
     {
+        detachmentTransferred.Invoke(currentDetachment);
         Debug.Log("OnTransfer");
     }
 
-    public void OnRuleOfEngamentChanged()
+    public void OnRuleOfEngamentChanged(int idx)
     {
-        Debug.Log("OnRuleOfEngamentChanged");
+        Debug.Log($"OnRuleOfEngamentChanged {idx}");
     }
 
     // Start is called before the first frame update

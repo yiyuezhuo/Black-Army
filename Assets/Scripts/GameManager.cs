@@ -12,17 +12,13 @@ public class GameManager : MonoBehaviour
     public UnityEvent stepped;
     public UnityEvent newTurnArrived;
     public UnityEvent<Detachment> detachmentSelected;
+    public UnityEvent detachmentsChanged;
 
     Hex lastSelectedHex;
     int currentSelectingIdx;
 
     private void Awake()
     {
-        /*
-        var data = new YYZ.BlackArmy.Loader.RawData() { reader = new UnityReader() };
-        data.Load();
-        state = data.GetGameState();
-        */
         state = Provider.state;
     }
 
@@ -51,6 +47,8 @@ public class GameManager : MonoBehaviour
         
     }
 
+    public void OnDetachmentsChanged() => detachmentsChanged.Invoke();
+
     public void stackClicked(Hex hex, Side side)
     {
         // Debug.Log($"stackClicked({hex}, {side})");
@@ -58,7 +56,9 @@ public class GameManager : MonoBehaviour
 
         var currentSideStack = hex.Detachments.Where(d => d.Side == side).ToList();
         currentSelectingIdx = hex == lastSelectedHex ? (currentSelectingIdx + 1) % currentSideStack.Count : 0;
+        lastSelectedHex = hex;
         var detachment = currentSideStack[currentSelectingIdx];
+        Debug.Log($"currentSideStack.Count={currentSideStack.Count}, currentSelectingIdx={currentSelectingIdx}, hex == lastSelectedHex:{hex == lastSelectedHex}");
         detachmentSelected.Invoke(detachment);
     }
 }
