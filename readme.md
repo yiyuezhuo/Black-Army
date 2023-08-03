@@ -8,11 +8,35 @@ In November 1920, Nestor Makhno and its Anarchists troops, Black Army, is backst
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5Ni5wbmc=/original/z6zZ9C.png">
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5NC5wbmc=/original/rU4BX4.png">
 
+## Combat Resolution
+
+### Principle
+
+Basically, every troop will generate "chance" points, which will be modified by the leader's corresponding ability (guerrilla if one side has small troops (< 5000 men), otherwise operational.) and the current hex global situation. Then generated potential combat will be divided into 3 categories:
+
+- Disadvantage: suffer heavy casualties but soften up the enemy at least.
+- Balanced: take moderate casualties and soften up the enemy and sometimes will take more advance.
+- Advantage: Launch an attack in good time, breaks the defensive line, or even surround and annihilate the local enemy. Smart counterattack to cancel enemy's advance... etc.
+
+According to the Rule of Engagement specified by the player or AI, the commander will only tale a part of chances, they will also sometime miss good chances and use bad chances according to their ability and traits:
+
+- Disengagement: Tried to evade all combat even very good chance.
+- Passive: Exploit only advantage combat.
+- Balanced (Attack): Use Advantage and balanced chance but reject disadvantage.
+- Aggressive: Accepe all chance and corresponding heavy loss.
+
+Usually, one side will choose balanced RoE while the opposite will use passive. Once one side is under heavy debuff introduced by area combat modifier (denoting one side lost important position and traffic line to the opposite), they will decide not to engage in this area and fallback to the next position (maybe a neighbor hex or a hex has good terrain for defense), so they will choose disengagement, while opposite may choose balanced or aggressive to exploit its local advantage.
+
+High-mobility unit will generate more chance points, while they have the same "chance defense" points. So if successful, the high-mobility unit will make many advantage combats. But if they're "pinned down" by failed attack or counter-attack, they make no difference compared to foot infantry.
+
+### Model
+
 ## TODO List
 
 Currently, only navigation, basic movement & turn and re-orgnization are implemented. 
 
 - [x] Fix WebGL export (IL2CPP issue) and 3D view selection issue (canvas's event camera)
+- [ ] Fix arrow shape and progression display issue due to shader. 
 - [ ] Global tactical modifier driven combat resolution and UI binding
 - [ ] Animations of sub-turns resolving
 - [ ] Simple Supply & Reforcement & Replacement
