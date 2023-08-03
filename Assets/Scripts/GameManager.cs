@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour
         var path = YYZ.PathFinding.PathFinding<Hex>.AStar(graph, currentDetachment.Hex, hex);
 
         var s = string.Join(',', path.Select(hex => hex.ToString()));
-        Debug.Log($"path=[{path.Count}]:{s}");
+        // Debug.Log($"path=[{path.Count}]:{s}");
 
         if (path.Count < 2)
         {

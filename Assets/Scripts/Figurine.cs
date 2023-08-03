@@ -37,7 +37,7 @@ public class Figurine : MonoBehaviour, IPointerClickHandler // The name is borro
 
     public void OnPointerClick(PointerEventData pointerEventData)
     {
-        // Debug.Log($"{pointerEventData}, {hex}, {side}");
+        Debug.Log($"Figurine: {hex}, {side}, {pointerEventData}");
         clicked.Invoke(hex, side);
     }
 }

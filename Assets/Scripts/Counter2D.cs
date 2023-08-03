@@ -31,7 +31,7 @@ public class Counter2D : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData pointerEventData)
     {
-        // Debug.Log($"{pointerEventData}, {hex}, {side}");
+        Debug.Log($"Counter2D: {hex}, {side}, {pointerEventData}");
         clicked.Invoke(hex, side);
     }
 

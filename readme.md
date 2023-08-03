@@ -8,6 +8,18 @@ In November 1920, Nestor Makhno and its Anarchists troops, Black Army, is backst
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5Ni5wbmc=/original/z6zZ9C.png">
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5NC5wbmc=/original/rU4BX4.png">
 
+## TODO List
+
+Currently, only navigation, basic movement & turn and re-orgnization are implemented. 
+
+- [x] Fix WebGL export (IL2CPP issue) and 3D view selection issue (canvas's event camera)
+- [ ] Global tactical modifier driven combat resolution and UI binding
+- [ ] Animations of sub-turns resolving
+- [ ] Simple Supply & Reforcement & Replacement
+- [ ] VP & Global morale effects on Anarchists (especially move speed and supply)
+- [ ] Simple AI
+- [ ] Deep research on Anarchists and Red army's deployment and strength. 
+
 ## Acknowledgement
 
 RatbyteBoss's [Free Hex Tile Game Assets](https://ratbyteboss.itch.io/hex-tile-assets)

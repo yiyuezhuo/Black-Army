@@ -1,3 +1,4 @@
+// Obsolete
 namespace YYZ.BlackArmy.Schema
 {
     using CsvHelper.Configuration.Attributes;
