@@ -16,6 +16,9 @@ namespace YYZ.BlackArmy.Model
     public class Leader
     {
         public string Name;
+
+        public string Trait;
+
         public int Strategic;
         public int Operational;
         public int Tactical;
@@ -291,6 +294,10 @@ namespace YYZ.BlackArmy.Model
         public Leader PlaceholderLeader;
         public List<Detachment> Detachments = new();
         public bool RailroadMovementAvailable;
+
+        public string PlaceholderLeaderName;
+        public string PlaceholderLeaderTrait;
+        // public string Tags;
 
         public override string ToString()
         {

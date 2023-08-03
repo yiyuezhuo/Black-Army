@@ -49,7 +49,7 @@ public static class Provider
     static Provider()
     {
         var data = new YYZ.BlackArmy.Loader.RawData() { reader = new UnityReader() };
-        data.Load();
+        // data.Load();
 
         Debug.Log(data);
 
