@@ -85,6 +85,16 @@ namespace YYZ.BlackArmy.Loader
             public int Political;
         }
 
+        static Dictionary<string, int> moraleCodeMap = new()
+        {
+            {"A", 6},
+            {"B", 5},
+            {"C", 4},
+            {"D", 3},
+            {"E", 2},
+            {"F", 1}
+        };
+
         public GameState GetGameState()
         {
             // First Pass: Barebone Allocation
@@ -112,7 +122,8 @@ namespace YYZ.BlackArmy.Loader
             var detachmentMap = ReadCsv("Detachments.csv", (csv) => new Detachment(){
                 Name=csv.GetField<string>("ID"),
                 Side=sideMap[csv.GetField<string>("Side")],
-                Hex=hexMap[(csv.GetField<int>("X"), csv.GetField<int>("Y"))]
+                Hex=hexMap[(csv.GetField<int>("X"), csv.GetField<int>("Y"))],
+                RuleOfEngagement=GameState.RoEList[0]
             }).ToDictionary(d => d.Name);
 
             var traitMap = ReadCsv("Trait Stats.csv", (csv) => new TraitStats(){
@@ -138,6 +149,16 @@ namespace YYZ.BlackArmy.Loader
                 Name=csv.GetField<string>("ID"),
                 Category=elementCategoryMap[csv.GetField<string>("Category")],
                 AllocationCoef=csv.GetField<float>("Allocation Coefficient"),
+                FireSoft=csv.GetField<float>("Fire Soft"),
+                FireHard=csv.GetField<float>("Fire Hard"),
+                // Fire=csv.GetField<float>("Fire"),
+                // Assault=csv.GetField<float>("Assault"),
+                AssaultAttack=csv.GetField<float>("Assault Attack"),
+                AssaultDefense=csv.GetField<float>("Assault Defense"),
+                Width=csv.GetField<float>("Width"),
+                ArmorValue=csv.GetField<float>("Armor Value"),
+                Defense=csv.GetField<float>("Defense"),
+                Morale=moraleCodeMap[csv.GetField<string>("Morale")],
                 Manpower=csv.GetField<int>("Manpower"),
                 Speed=csv.GetField<float>("Speed"),
                 TacticalSpeedModifier=csv.GetField<float>("Tactical Speed Modifier")
@@ -188,6 +209,10 @@ namespace YYZ.BlackArmy.Loader
                 var trait = traitMap[side.PlaceholderLeaderTrait];
                 ApplyTrait(side.PlaceholderLeader, trait);
             }
+
+            foreach(var hex in hexMap.Values)
+                foreach(var side in gameSides)
+                    hex.SideValueMap[side] = new();
 
             // Create GameState
 

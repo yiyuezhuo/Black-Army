@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
-using UnityEngine;
 
 namespace YYZ.BlackArmy.Model
 {
@@ -60,10 +59,17 @@ namespace YYZ.BlackArmy.Model
         {
             return $"ElementType({Name}, {Category.Name}, AllocationCoef={AllocationCoef}, AttachCoefMap=[{AttachCoefMap.Count}], {IsAttachment()})";
         }
-
-        public float Fire;
+        public float FireSoft;
+        public float FireHard;
+        // public float Fire;
         // public float HardAttack;
-        public float Assault;
+        // public float Assault;
+        
+        public float AssaultAttack;
+        public float AssaultDefense;
+        public float Width;
+        public float ArmorValue;
+        
         public float Defense;
         // public float HitPoint=1;// Normal Infantry/Cavalry = 1, gun / tank = 0.1
         // public bool HardTarget; // armored car/train
@@ -151,6 +157,14 @@ namespace YYZ.BlackArmy.Model
             Elements[type].Strength -= strength;
             if(Elements[type].Strength <= 0)
                 Elements.Remove(type);
+        }
+
+        public void Set(ElementType type, int strength)
+        {
+            if(strength <= 0)
+                Elements.Remove(type);
+            else
+                Elements[type].Strength = strength;
         }
 
         public bool Contains(ElementType type)
@@ -305,6 +319,11 @@ namespace YYZ.BlackArmy.Model
         }
     }
 
+    public class HexSideValue
+    {
+        public float Situation;
+    }
+
     public class Hex
     {
         public int X;
@@ -312,6 +331,7 @@ namespace YYZ.BlackArmy.Model
         public string Type;
         public Dictionary<Hex, Edge> EdgeMap = new();
         public List<Detachment> Detachments = new();
+        public Dictionary<Side, HexSideValue> SideValueMap = new();
 
         public override string ToString()
         {
@@ -339,6 +359,14 @@ namespace YYZ.BlackArmy.Model
         public Hex FinalTarget{ get => Waypoints.Count > 0 ? Waypoints[Waypoints.Count - 1] : CurrentTarget; }
     }
 
+    public class RuleOfEngagement
+    {
+        public string Name;
+        public float FireThreshold = 1f;
+        public float AssaultThreshold = 2f;
+        public float Aggressiveness;
+    }
+
     public class Detachment
     {
         public string Name;
@@ -346,6 +374,7 @@ namespace YYZ.BlackArmy.Model
         public ElementContainer Elements = new();
         public Side Side;
         public Hex Hex;
+        public RuleOfEngagement RuleOfEngagement;
 
         public Leader CurrentLeader { get => Leaders.Count >= 1 ? Leaders[0] : Side.PlaceholderLeader; }
         public MovingState MovingState; // null => the unit is not moving
@@ -425,6 +454,15 @@ namespace YYZ.BlackArmy.Model
 
         public List<ElementCategory> ElementCategories;
         public ElementTypeSystem ElementTypeSystem;
+
+        
+        public static List<RuleOfEngagement> RoEList = new() // [0] is the default one
+        {
+            new(){Name="Balanced", FireThreshold=1f, AssaultThreshold=2f, Aggressiveness=1},
+            new(){Name="Aggressive", FireThreshold=0.5f, AssaultThreshold=1f, Aggressiveness=2},
+            new(){Name="Passive", FireThreshold=1.5f, AssaultThreshold=3f, Aggressiveness=0}
+        };
+        
 
         public override string ToString()
         {
