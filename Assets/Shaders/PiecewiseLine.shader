@@ -7,11 +7,18 @@ Shader "Unlit/PiecewiseLine"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        // https://stackoverflow.com/questions/33322167/how-to-write-a-unity-shader-that-respects-sorting-layers
+        // Tags { "RenderType"="Opaque" }
+        Tags{"Queue" = "Transparent"}
         LOD 100
 
         Pass
         {
+            ZTest Off
+
+            Blend SrcAlpha
+            OneMinusSrcAlpha
+            
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -53,7 +60,7 @@ Shader "Unlit/PiecewiseLine"
                 
                 
                 if (i.uv.x < _Percent) {
-                    col = col / 2;
+                    col = col * 0.8;
                     // col = sqrt(col);
                 }
                 

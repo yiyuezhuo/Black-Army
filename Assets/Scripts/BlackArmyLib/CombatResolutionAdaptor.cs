@@ -19,29 +19,29 @@ namespace YYZ.BlackArmy.CombatResolution
         public float TacticSpeed{get => Type.Speed * Type.TacticalSpeedModifier;}
     }
 
-    public class UnitCommited : YYZ.CombatResolution.IUnit
+    public class UnitCommitted : YYZ.CombatResolution.IUnit
     {
         public Unit Unit;
-        public int Commited;
+        public int Committed;
         public int Lost = 0;
 
         public override string ToString()
         {
-            return $"UnitCommited({Unit.Strength}/{Commited}/{Lost})";
+            return $"UnitCommited({Unit.Strength}/{Committed}/{Lost})";
         }
 
-        public UnitCommited(Unit unit, int commited)
+        public UnitCommitted(Unit unit, int commited)
         {
             Unit = unit;
-            Commited = commited;
+            Committed = commited;
         }
 
         public int Strength
         {
-            get => Commited - Lost;
+            get => Committed - Lost;
             set
             {
-                Lost = Commited - value;
+                Lost = Committed - value;
                 Unit.Strength = Unit.Strength - Lost;
             }
         }
@@ -80,6 +80,8 @@ namespace YYZ.BlackArmy.CombatResolution
         public RuleOfEngagement RuleOfEngagement; 
         public Side Side;
         public Hex Hex;
+        public Leader Leader;
+        
     }
 
     public class CombatResultSummary: YYZ.CombatResolution.Examples.ICombatResultLowerLimitSummary
@@ -90,6 +92,7 @@ namespace YYZ.BlackArmy.CombatResolution
         public float DefenderLostLevel{get; set;}
         public float AttackerSituationEffect; // 0 -> 0 effect, 1 -> normal retreat effect.
         public float DefenderSituationEffect;
+        public string ShortName;
     }
 
     public class LowerResultSummaryWrapper : CombatGenerator.ICombatResult
@@ -116,9 +119,9 @@ namespace YYZ.BlackArmy.CombatResolution
             Hex = hex;
         }
 
-        (YYZ.CombatResolution.ConmbatSide, List<UnitCommited>) ApplyCommand(CombatGenerator.CombatGroupDispatchCommand groupCommand, IEnumerable<Unit> units)
+        (YYZ.CombatResolution.ConmbatSide, List<UnitCommitted>) ApplyCommand(CombatGenerator.CombatGroupDispatchCommand groupCommand, IEnumerable<Unit> units)
         {
-            var unitsCommited = groupCommand.Units.Zip(units, (command, unit) => new UnitCommited(unit, command.Strength)).ToList();
+            var unitsCommited = groupCommand.Units.Zip(units, (command, unit) => new UnitCommitted(unit, command.Strength)).ToList();
             var manpower = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength);
             var morale = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength * u.Unit.Type.Morale) / manpower;
             var combatSide = new YYZ.CombatResolution.ConmbatSide(){Units=unitsCommited, Morale=morale};
@@ -142,14 +145,14 @@ namespace YYZ.BlackArmy.CombatResolution
         public static YYZ.CombatResolution.Examples.CombatResultSummaryResolver<CombatResultSummary> SummaryResolver = new()
         {
             AttackerLostResults = new(){
-                new(){Name="Repelled",  LowerLimit=0.2f,    AttackerLostLevel=1f,       DefenderLostLevel=0f,       AttackerSituationEffect=0f, DefenderSituationEffect=0}
+                new(){Name="Repelled",      ShortName="RE",  LowerLimit=0.2f,    AttackerLostLevel=1f,       DefenderLostLevel=0f,       AttackerSituationEffect=0f, DefenderSituationEffect=0}
             },
             DefenderLostResults = new(){
-                new(){Name="Stalemate", LowerLimit= -1f,    AttackerLostLevel=0.5f,     DefenderLostLevel=0.5f,     AttackerSituationEffect=0f, DefenderSituationEffect=0},
-                new(){Name="Soften-Up", LowerLimit= 0.125f, AttackerLostLevel=0.25f,    DefenderLostLevel=0.75f,    AttackerSituationEffect=0f, DefenderSituationEffect=0.2f},
-                new(){Name="Fallback",  LowerLimit= 0.25f,  AttackerLostLevel=0f,       DefenderLostLevel=1f,       AttackerSituationEffect=0f, DefenderSituationEffect=1f},
-                new(){Name="Routed",    LowerLimit= 0.5f,   AttackerLostLevel=0f,       DefenderLostLevel=2f,       AttackerSituationEffect=0f, DefenderSituationEffect=3f},
-                new(){Name="Overrun",   LowerLimit= 1f,     AttackerLostLevel=0f,       DefenderLostLevel=3f,       AttackerSituationEffect=0f, DefenderSituationEffect=5f},
+                new(){Name="Stalemate",     ShortName="ST", LowerLimit= -1f,    AttackerLostLevel=0.5f,     DefenderLostLevel=0.5f,     AttackerSituationEffect=0f, DefenderSituationEffect=0},
+                new(){Name="Soften",        ShortName="SO", LowerLimit= 0.125f, AttackerLostLevel=0.25f,    DefenderLostLevel=0.75f,    AttackerSituationEffect=0f, DefenderSituationEffect=0.2f},
+                new(){Name="Fallback",      ShortName="FA", LowerLimit= 0.25f,  AttackerLostLevel=0f,       DefenderLostLevel=1f,       AttackerSituationEffect=0f, DefenderSituationEffect=1f},
+                new(){Name="Breakthrough",  ShortName="BR", LowerLimit= 0.5f,   AttackerLostLevel=0f,       DefenderLostLevel=2f,       AttackerSituationEffect=0f, DefenderSituationEffect=3f},
+                new(){Name="Overrun",       ShortName="OV", LowerLimit= 1f,     AttackerLostLevel=0f,       DefenderLostLevel=3f,       AttackerSituationEffect=0f, DefenderSituationEffect=5f},
             }
         };
 
@@ -160,13 +163,13 @@ namespace YYZ.BlackArmy.CombatResolution
             ResultResolver=SummaryResolver
         };
 
-        float UpdateSituation(CombatGroup group, List<UnitCommited> unitCommited, CombatResultSummary summary, bool isActive)
+        float UpdateSituation(CombatGroup group, List<UnitCommitted> unitCommited, CombatResultSummary summary, bool isActive)
         {
             var p = unitCommited.Sum(u => u.Lost * u.Unit.Width) / unitCommited.Sum(u => u.Unit.Strength * u.Unit.Width);
             var coef = isActive ? summary.AttackerSituationEffect : summary.DefenderSituationEffect;
             var delta = -p * SituationBaseCoef * coef;
             group.Situation += delta;
-            return delta; 
+            return delta;
         }
 
         public class ResolveMessage
@@ -174,10 +177,10 @@ namespace YYZ.BlackArmy.CombatResolution
             public class SideMessage
             {
                 public float SituationDelta;
-                public List<UnitCommited> UnitsCommited;
+                public List<UnitCommitted> UnitsCommitted;
                 public override string ToString()
                 {
-                    var s = string.Join(",", UnitsCommited);
+                    var s = string.Join(",", UnitsCommitted);
                     return $"SideMessage({SituationDelta}, {s})";
                 }
             }
@@ -215,8 +218,8 @@ namespace YYZ.BlackArmy.CombatResolution
                 yield return new()
                 {
                     Combat=combat, Result=res, 
-                    Attacker=new(){SituationDelta=asDelta, UnitsCommited=atkCommitedUnits},
-                    Defender=new(){SituationDelta=dsDelta, UnitsCommited=defCommitedUnits},
+                    Attacker=new(){SituationDelta=asDelta, UnitsCommitted=atkCommitedUnits},
+                    Defender=new(){SituationDelta=dsDelta, UnitsCommitted=defCommitedUnits},
                 };
             }
         }
@@ -253,7 +256,8 @@ namespace YYZ.BlackArmy.CombatResolution
                     // extra
                     RuleOfEngagement=maxDetachment.RuleOfEngagement,
                     Side=side,
-                    Hex=hex
+                    Hex=hex,
+                    Leader=leader
                 };
                 combatGroups.Add(combatGroup);
             }

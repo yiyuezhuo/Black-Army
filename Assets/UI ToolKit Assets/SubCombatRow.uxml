@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20ToolKit%20Assets/Runtime.uss?fileID=7433441132597879392&amp;guid=d1a58c8e52f103347b8c51d96ae7a344&amp;type=3#Runtime" />
+    <ui:VisualElement name="Background" class="sub-combat-row" style="color: rgb(255, 255, 255); width: 100%; height: 50px; background-color: rgb(0, 0, 0); flex-direction: row; -unity-background-image-tint-color: rgb(63, 63, 63); margin-bottom: 0; margin-left: 0; margin-right: 0; flex-shrink: 0; margin-top: 0;">
+        <ui:VisualElement name="LeftBar" style="flex-grow: 0; flex-direction: row; width: 45%; flex-shrink: 0;">
+            <ui:VisualElement name="LeftFlag" style="background-image: resource(&apos;Flags/Black&apos;); width: 100px; height: 50px; -unity-background-scale-mode: scale-to-fit; flex-shrink: 0;" />
+            <ui:Label text="Committed: 170 (-20)&#10;Situation: +1% &#10;Chance: -10 (7%)" display-tooltip-when-elided="true" name="LeftSubCombatSummary" style="flex-grow: 1; margin-left: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ResultSummary" tooltip="Combat Type: Fire" style="background-color: rgba(255, 255, 255, 0); background-image: url(&apos;project://database/Assets/Resources/Combat%20Result%20Diagram/Fallback.png?fileID=2800000&amp;guid=6faea5537df44aa4eb2094e1e781ee33&amp;type=3#Fallback&apos;); -unity-background-scale-mode: scale-to-fit; width: 10%; -unity-background-image-tint-color: rgb(253, 240, 106);" />
+        <ui:VisualElement name="RightBar" style="flex-grow: 1; flex-direction: row-reverse; width: 45%;">
+            <ui:VisualElement name="RightFlag" style="background-image: resource(&apos;Flags/Red&apos;); width: 100px; height: 50px; -unity-background-scale-mode: scale-to-fit; flex-shrink: 0;" />
+            <ui:Label text="Committed: 1700 (-200)&#10;Situation: +1% &#10;Chance: -10 (7%)" display-tooltip-when-elided="true" name="RightSubCombatSummary" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

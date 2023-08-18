@@ -3,17 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using YYZ.BlackArmy.Model;
 using System.Linq;
-using System.IO;
+// using System.IO;
 
-public class UnityReader: YYZ.BlackArmy.Loader.ITableReader
-{
-    public byte[] Read(string name)
-    {
-        var path = "TableData/" + Path.GetFileNameWithoutExtension(name);
-        var textAsset = Resources.Load<TextAsset>(path);
-        return textAsset.bytes;
-    }
-}
 
 public class CounterCanvas : MonoBehaviour
 {

@@ -5,6 +5,8 @@ using YYZ.BlackArmy.Model;
 // using UnityEngine.Events;
 using System.Linq;
 using System;
+using System.IO;
+using YYZ.BlackArmy.CombatResolution;
 
 public static class Helpers
 {
@@ -27,6 +29,11 @@ public static class Helpers
         return portrait;
     }
 
+    public static Sprite GetSprite(CombatResultSummary summary)
+    {
+        return Resources.Load<Sprite>($"Combat Result Diagram/{summary.Name}");
+    }
+
     public static string FormatLeaderStats(Leader leader) => $"{leader.Strategic}/{leader.Operational}/{leader.Guerrilla}/{leader.Tactical}";
 
     public static IEnumerable<(ElementCategory, int)> GetElementCategoryStrength(ElementContainer elementContainer)
@@ -40,6 +47,17 @@ public static class Helpers
             yield return (category, categoryStrengthMap[category]);
     }
 }
+
+public class UnityReader: YYZ.BlackArmy.Loader.ITableReader
+{
+    public byte[] Read(string name)
+    {
+        var path = "TableData/" + Path.GetFileNameWithoutExtension(name);
+        var textAsset = Resources.Load<TextAsset>(path);
+        return textAsset.bytes;
+    }
+}
+
 
 public static class Provider
 {

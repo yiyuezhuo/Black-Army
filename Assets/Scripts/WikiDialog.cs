@@ -2,8 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
+// using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UIElements;
+// using UnityEngine.EventSystems;
 
-public class WikiDialog : MonoBehaviour
+
+public class DraggableControl: MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerMoveHandler
+{
+    bool dragging = false;
+    Vector2 lastPosition;
+
+    public void OnPointerDown(PointerEventData ev)
+    {
+        // Debug.Log("PointerDown");
+        dragging = true;
+        lastPosition = ev.position;
+    }
+
+
+    public void OnPointerUp(PointerEventData ev)
+    {
+        // Debug.Log("PointerUp");
+        dragging = false;
+    }
+
+    public void OnPointerMove(PointerEventData ev)
+    {
+        // Debug.Log("PointerMove");
+        if (dragging)
+        {
+            var delta = ev.position - lastPosition;
+            lastPosition = ev.position;
+            transform.position += new Vector3(delta.x, delta.y, 0);
+        }
+    }
+
+}
+
+public class WikiDialog : DraggableControl
 {
     public TMP_InputField urlField;
 

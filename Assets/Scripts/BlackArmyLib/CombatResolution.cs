@@ -298,9 +298,9 @@ namespace YYZ.CombatResolution
                 },
                 DefenderLostResults = new(){
                     new(){Name="Stalemate", LowerLimit= -1f},
-                    new(){Name="Soften-Up", LowerLimit= 0.125f},
+                    new(){Name="Soften", LowerLimit= 0.125f},
                     new(){Name="Fallback", LowerLimit= 0.25f},
-                    new(){Name="Routed", LowerLimit= 0.5f},
+                    new(){Name="Breakthrough", LowerLimit= 0.5f},
                     new(){Name="Overrun", LowerLimit= 1f},
                 }
             };

@@ -36,7 +36,7 @@ High-mobility unit will generate more chance points, while they have the same "c
 Currently, only navigation, basic movement & turn and re-orgnization are implemented. 
 
 - [x] Fix WebGL export (IL2CPP issue) and 3D view selection issue (canvas's event camera)
-- [ ] Fix arrow shape and progression display issue due to shader. 
+- [x] Fix arrow shape and progression display issue due to shader. (Shader's Queue tag is not set to the expected "Transparent" used by other 2D renders).
 - [ ] Global tactical modifier driven combat resolution and UI binding
 - [ ] Animations of sub-turns resolving
 - [ ] Simple Supply & Reforcement & Replacement

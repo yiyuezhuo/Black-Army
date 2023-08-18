@@ -26,7 +26,7 @@ public class MoveLine : MonoBehaviour
     {
         line.positionCount = points.Length;
         line.SetPositions(points);
-        // line.material.SetFloat("_Percent", percent); // TODO: PiecewiseLine has some rendering ordering issue I don't the time to fix.
+        line.material.SetFloat("_Percent", percent); // TODO: PiecewiseLine has some rendering ordering issue I don't have the time to fix.
     }
 
     public void OnDetachmentSelected(Detachment detachment)

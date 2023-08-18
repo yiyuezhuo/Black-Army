@@ -32,7 +32,7 @@ namespace YYZ.CombatGenerator
         public float Situation{get; set;} // -100%~100% (-1.0 ~ +1.0)
     }
 
-    class Chance
+    public class Chance
     {
         float percent=1f;
         public float BeginPotential;
@@ -51,6 +51,18 @@ namespace YYZ.CombatGenerator
         public float Clamp(float x) => MathF.Min(Potential, MathF.Min(Baseline, x));
     }
 
+    public class ChanceSnapshot
+    {
+        public float Potential;
+        public float Baseline;
+        public ChanceSnapshot(Chance chance)
+        {
+            Potential = chance.Potential;
+            Baseline = chance.Baseline;
+        }
+    }
+
+
     public interface ICombatResult // Combat Generator receive result of every combat it generated
     {
         public float AttackerLostLevel{get;} // Victory = 0, Normal failure => 1, serious failure => > 1.0
@@ -65,6 +77,8 @@ namespace YYZ.CombatGenerator
     public class CombatGroupDispatchCommand
     {
         public List<UnitDispatchCommand> Units;
+        public ChanceSnapshot BeginChance;
+        public ChanceSnapshot EndChance; // But it's before the real resolution.
     }
 
     public enum CombatType
@@ -106,6 +120,7 @@ namespace YYZ.CombatGenerator
         public float CombatResultEffectCoef = 1f;
         public float passiveCorrelation = 0.2f;
 
+        /*
         Chance MakeChance(ICombatGroup group)
         {
             return new Chance()
@@ -114,6 +129,7 @@ namespace YYZ.CombatGenerator
                 BeginBaseline = group.Units.Sum(u => u.Strength * u.Width * BaselineTacticalSpeed)
             };
         }
+        */
 
         float RollCombatAsset(Chance chance)
         {
@@ -129,8 +145,8 @@ namespace YYZ.CombatGenerator
             public Chance Chance;
             public CombatGroupWrapper(ICombatGroup group, float baselineTacticalSpeed)
             {
-                this.Group = group;
-                this.Chance = MakeChance(group, baselineTacticalSpeed);
+                Group = group;
+                Chance = MakeChance(group, baselineTacticalSpeed);
             }
 
             public float TotalWidth() => Group.Units.Sum(u => u.Strength * u.Width);
@@ -168,6 +184,7 @@ namespace YYZ.CombatGenerator
             return CombatType.Assault;
         }
 
+
         public IEnumerable<GeneratedCombat> Generate(ICombatGroup attackerGroup, ICombatGroup defenderGroup)
         {
             // The combat we modeled (Anarchist's campaign 1920~1921) doesn't show much defenders's superiority so we handle them symmetrically at this point.
@@ -181,6 +198,10 @@ namespace YYZ.CombatGenerator
                 var attackerInitiative = NextFloat() < ap / (ap + dp);
 
                 (var active, var passive) = attackerInitiative ? (attacker, defender) : (defender, attacker);
+
+                var activeBeginChance = new ChanceSnapshot(active.Chance);
+                var passiveBeginChance = new ChanceSnapshot(passive.Chance);
+
                 var activeAsset = RollCombatAsset(active.Chance);
                 active.Chance.Potential -= activeAsset;
                 if(!BaseProbCheck())
@@ -197,7 +218,6 @@ namespace YYZ.CombatGenerator
                     continue;
 
                 var passiveAsset = RollCombatAsset(passive.Chance);
-
                 passiveAsset = passive.Chance.Clamp((1 - passiveCorrelation) * passiveAsset + passiveCorrelation * activeAsset);
 
                 if(passiveAsset == 0)
@@ -215,8 +235,8 @@ namespace YYZ.CombatGenerator
                     case CombatType.Assault:
                         passive.Chance.Baseline -= passiveAsset;
 
-                        var ad = MakeGroupDispatchCommand(activeAsset, active);
-                        var pd = MakeGroupDispatchCommand(passiveAsset, passive);
+                        var ad = MakeGroupDispatchCommand(activeAsset, active, activeBeginChance);
+                        var pd = MakeGroupDispatchCommand(passiveAsset, passive, passiveBeginChance);
                         (var attackDispatch, var defenderDispatch) = attackerInitiative ? (ad, pd) : (pd, ad);
                         yield return new GeneratedCombat()
                         {
@@ -241,7 +261,7 @@ namespace YYZ.CombatGenerator
             }
         }
 
-        CombatGroupDispatchCommand MakeGroupDispatchCommand(float asset, CombatGroupWrapper group)
+        CombatGroupDispatchCommand MakeGroupDispatchCommand(float asset, CombatGroupWrapper group, ChanceSnapshot chanceSnapshot)
         {
             // TODO: Implement Heterogeneity Dispatch 
             var percent = asset / group.Group.Units.Sum(u => u.Strength * u.Width * BaselineTacticalSpeed);
@@ -250,7 +270,12 @@ namespace YYZ.CombatGenerator
             {
                 Strength=RandomRound(percent*u.Strength)
             }).ToList();
-            var groupDispatchCommand = new CombatGroupDispatchCommand(){Units=unitDispatchList};
+            var groupDispatchCommand = new CombatGroupDispatchCommand()
+            {
+                Units = unitDispatchList,
+                BeginChance = chanceSnapshot,
+                EndChance = new ChanceSnapshot(group.Chance)
+            };
             return groupDispatchCommand;
         }
     }

@@ -1,0 +1,107 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20ToolKit%20Assets/Runtime.uss?fileID=7433441132597879392&amp;guid=d1a58c8e52f103347b8c51d96ae7a344&amp;type=3#Runtime" />
+    <ui:VisualElement name="BackgroundPanel" style="color: rgb(255, 255, 255); -unity-text-outline-color: rgb(56, 56, 56); background-color: rgb(56, 56, 56); bottom: auto; position: relative; height: auto; width: 600px; max-height: 700px;">
+        <ui:Label text="The Combat in Gulyai-Polye" display-tooltip-when-elided="true" name="Location" style="-unity-text-align: upper-center; font-size: 28px;" />
+        <ui:Label text="1/1/1921" display-tooltip-when-elided="true" name="Date" style="-unity-text-align: upper-center; font-size: 20px;" />
+        <ui:VisualElement name="InfoRow" style="flex-direction: row; flex-shrink: 0;">
+            <ui:VisualElement name="LeftSummary" style="flex-direction: row; width: 49%; flex-shrink: 0; padding-left: 0; border-right-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);">
+                <ui:VisualElement name="LeftLeaderPortrait" style="left: 0; background-image: resource(&apos;Leaders/Black/Makhno&apos;); width: 30%; height: 100px; -unity-background-scale-mode: scale-to-fit;" />
+                <ui:Label text="4000 men (-45)&#10;Committed: 3000&#10;Total Tactic: 13 (+10%)&#10;Situation: +10% (+2%)&#10;Move Speed:-75%&#10;Chance: 500/300" display-tooltip-when-elided="true" name="LeftTextSummary" style="flex-grow: 1;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="RightSummary" style="right: auto; flex-grow: 1; flex-shrink: 0; flex-direction: row-reverse;">
+                <ui:VisualElement name="RightLeaderPortrait" style="left: 0; background-image: resource(&apos;Leaders/Red/Frunze&apos;); width: 30%; height: 100px; -unity-background-scale-mode: scale-to-fit;" />
+                <ui:Label text="20000 men (-250)&#10;Committed: 2500&#10;Total Tactic: 13 (+10%)&#10;Situation: -10% (-2%)&#10;Move Speed:-85%&#10;Chance: 400/200" display-tooltip-when-elided="true" name="RightTextSummary" style="flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="LeaderNameRow" style="flex-direction: row; border-left-width: 10px; border-right-width: 10px; flex-shrink: 0;">
+            <ui:Label text="Makhno (6/5/6/6)" display-tooltip-when-elided="true" tooltip="(Strategic, Operational, Guerrilla, Tactical)" name="LeftLeaderStats" style="-unity-text-align: upper-left; flex-grow: 1;" />
+            <ui:Label text="Frunze (2/3/2/1)" display-tooltip-when-elided="true" tooltip="(Strategic, Operational, Guerrilla, Tactical)" name="RightLeaderStats" style="flex-grow: 1; -unity-text-align: upper-right;" />
+        </ui:VisualElement>
+        <ui:Foldout text="Category Summary Detail" value="false" name="CategorySummaryDetail" style="flex-direction: column; flex-shrink: 0;">
+            <ui:VisualElement name="CategorySummaryGrid" style="flex-direction: row; flex-wrap: wrap;">
+                <ui:Label text="Total" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="Commit" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="Lost" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="Remain" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" class="category-summary-cell category-summary-center" />
+                <ui:Label text="Total" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="Commit" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="Lost" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="Remain" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="Infantry" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="Cavalry" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="Tachanka" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="Gun" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="Arm. Car" tooltip="Armored Car" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="Arm. Train" tooltip="Armored Car" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label display-tooltip-when-elided="true" text="M.G" tooltip="Machine Gun" class="category-summary-cell category-summary-center" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+                <ui:Label text="100000" display-tooltip-when-elided="true" class="category-summary-cell" />
+            </ui:VisualElement>
+        </ui:Foldout>
+        <ui:VisualElement name="SubCombatTypes" style="flex-shrink: 0; flex-direction: row;">
+            <ui:Label text="7 Fire, 4 Assault" display-tooltip-when-elided="true" name="LeftSubCombatTypes" style="flex-grow: 1;" />
+            <ui:Label text="8 Fire, 3 Assault" display-tooltip-when-elided="true" name="RightSubCombatTypes" style="flex-grow: 1; -unity-text-align: upper-right;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SubCombatResults" style="flex-shrink: 0; flex-direction: row;">
+            <ui:Label text="3 RE, 4 ST, 3 SO, 3 FA, 2 RO, 2 OV" display-tooltip-when-elided="true" tooltip="RE: repelled, ST: Stalemate, SO: Softup, FA: Fallback, RO: Rounted, OV: Overun" name="LeftSubCombatResults" style="flex-grow: 1;" />
+            <ui:Label text="3 RE, 4 ST, 3 SO, 3 FA, 2 RO, 2 OV" display-tooltip-when-elided="true" name="RightSubCombatResults" style="flex-grow: 1; -unity-text-align: upper-right;" />
+        </ui:VisualElement>
+        <ui:ListView focusable="true" name="SubCombatListView" />
+        <ui:Button text="Confirm" display-tooltip-when-elided="true" name="ConfirmButton" style="background-color: rgb(56, 56, 56);" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="background" class="droppable" style="flex-grow: 1; background-color: rgb(212, 212, 212); width: 300px; height: 500px; max-height: 500px;">
+        <ui:Label text="DraggableLabel" display-tooltip-when-elided="true" name="DraggableLabel" style="position: absolute; top: 174px; left: 60px;" />
+        <ui:Button text="This is a Button" display-tooltip-when-elided="true" name="button" />
+        <ui:Toggle label="Display the counter?" name="toggle" />
+        <ui:TextField picking-mode="Ignore" label="Text Field" text="filler text" name="input-message" />
+    </ui:VisualElement>
+</ui:UXML>
