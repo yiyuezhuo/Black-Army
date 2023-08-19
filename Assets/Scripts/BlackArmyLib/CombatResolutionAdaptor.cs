@@ -168,12 +168,12 @@ namespace YYZ.BlackArmy.CombatResolution
             ResultResolver=SummaryResolver
         };
 
-        float UpdateSituation(CombatGroup group, List<UnitCommitted> unitCommited, CombatResultSummary summary, bool isActive)
+        float GetSituationDelta(CombatGroup group, List<UnitCommitted> unitCommited, CombatResultSummary summary, bool isActive)
         {
             var p = unitCommited.Sum(u => u.Lost * u.Unit.Width) / unitCommited.Sum(u => u.Unit.Strength * u.Unit.Width);
             var coef = isActive ? summary.AttackerSituationEffect : summary.DefenderSituationEffect;
             var delta = -p * SituationBaseCoef * coef;
-            group.Situation += delta;
+            // group.Situation += delta;
             return delta;
         }
 
@@ -219,14 +219,20 @@ namespace YYZ.BlackArmy.CombatResolution
                 res.ApplyTo(active.Units, passive.Units);
                 // res.ResultSummary.
                 // var ap = atkCommitedUnits.Sum(u => u.Lost * u.Unit.Width) / atkCommitedUnits.Sum(u => u.Commited * u.Unit.Width);
-                var asDelta = UpdateSituation(AttackerGroup, atkCommitedUnits, res.ResultSummary, combat.AttackerInitiative);
-                var dsDelta = UpdateSituation(DefenderGroup, defCommitedUnits, res.ResultSummary, !combat.AttackerInitiative);
+                var asDelta = GetSituationDelta(AttackerGroup, atkCommitedUnits, res.ResultSummary, combat.AttackerInitiative);
+                var dsDelta = GetSituationDelta(DefenderGroup, defCommitedUnits, res.ResultSummary, !combat.AttackerInitiative);
+
+                var aDelta = asDelta - dsDelta;
+                var dDelta = dsDelta - asDelta;
+
+                AttackerGroup.Situation += aDelta;
+                DefenderGroup.Situation += dDelta;
 
                 yield return new()
                 {
                     Combat=combat, Result=res, 
-                    Attacker=new(){SituationDelta=asDelta, UnitsCommitted=atkCommitedUnits},
-                    Defender=new(){SituationDelta=dsDelta, UnitsCommitted=defCommitedUnits},
+                    Attacker=new(){SituationDelta= aDelta, UnitsCommitted=atkCommitedUnits},
+                    Defender=new(){SituationDelta= dDelta, UnitsCommitted=defCommitedUnits},
                 };
             }
         }

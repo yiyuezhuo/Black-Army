@@ -16,10 +16,16 @@ public class GameManager : MonoBehaviour
     public UnityEvent detachmentsChanged;
     public UnityEvent<Detachment> currentDetachmentMovingStateChanged;
 
+    public UnityEvent turnResolveBegun;
+    public UnityEvent turnResolveStepped;
+    public UnityEvent turnResolveCompleted;
+
     Hex lastSelectedHex;
     int currentSelectingIdx;
 
     Detachment currentDetachment;
+
+    bool responsive = true;
 
     private void Awake()
     {
@@ -28,18 +34,42 @@ public class GameManager : MonoBehaviour
 
     public void Step()
     {
-        var turnBefore = state.Turn;
-        state.NextPhase();
+        // var turnBefore = state.Turn;
+        var newTurnWillArrive = state.IsLastPhaseOfTheTurn();
+        if (!newTurnWillArrive)
+        {
+            state.NextPhase();
+            OnStepped();
+            stepped.Invoke();
+        }
+        else
+        {
+            StartCoroutine(StepPost());
+        }
+    }
+
+    IEnumerator StepPost()
+    {
+        responsive = false;
+
+        var wait = new WaitForSeconds(0.1f);
+        var ie = state.NextPhaseIEnum();
+        turnResolveBegun.Invoke();
+        while (ie.MoveNext())
+        {
+            yield return wait;
+            turnResolveStepped.Invoke();
+        }
+        turnResolveCompleted.Invoke();
+
         OnStepped();
         stepped.Invoke();
-        if (state.Turn != turnBefore)
-        {
-            lastSelectedHex = null;
-            OnNewTurnArrived();
-            newTurnArrived.Invoke();
-        }
 
-        Debug.Log(state);
+        lastSelectedHex = null;
+        OnNewTurnArrived();
+        newTurnArrived.Invoke();
+
+        responsive = true;
     }
 
     void OnNewTurnArrived()
@@ -73,7 +103,7 @@ public class GameManager : MonoBehaviour
 
         if (side != state.CurrentSide) // Block non-current selection
         {
-            Provider.Message($"Can't issue orders to {side.Name} units since the current side is {state.CurrentSide.Name}");
+            Provider.Message($"Can't issue a order to {side.Name} units since the current side is {state.CurrentSide.Name}");
             return;
         }
 

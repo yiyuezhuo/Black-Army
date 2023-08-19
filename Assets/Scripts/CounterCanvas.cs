@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using YYZ.BlackArmy.Model;
 using System.Linq;
+using System;
 // using System.IO;
 
 
@@ -13,6 +14,8 @@ public class CounterCanvas : MonoBehaviour
     public GameObject Counter2DPrefab;
     public GridLayout grid;
     public GameManager gameManager;
+
+    // public Func<Hex, Side> ff;
 
     // Start is called before the first frame update
     void Start()
@@ -67,7 +70,7 @@ public class CounterCanvas : MonoBehaviour
         var counter = obj.GetComponent<Counter2D>();
         counter.side = side;
         counter.hex = hex;
-        counter.clicked.AddListener(gameManager.stackClicked);
+        counter.clicked.AddListener(gameManager.stackClicked); // TODO: decouple GameManager
 
         // var sprite = Resources.Load<Sprite>("Flags/" + side.Name);
         var sprite = Helpers.GetSprite(side);

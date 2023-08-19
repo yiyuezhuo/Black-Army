@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="SubTurnResolveBar" src="project://database/Assets/UI%20ToolKit%20Assets/SubTurnResolveProgression.uxml?fileID=9197481963319205126&amp;guid=6384e2f3ec0c7db4190a3fa35818501d&amp;type=3#SubTurnResolveBar" />
+    <ui:VisualElement>
+        <ui:Instance template="SubTurnResolveBar" name="SubTurnResolveProgression" />
+    </ui:VisualElement>
+</ui:UXML>

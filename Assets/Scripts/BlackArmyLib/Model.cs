@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Collections;
 
 namespace YYZ.BlackArmy.Model
 {
@@ -483,6 +484,12 @@ namespace YYZ.BlackArmy.Model
             }
         }
 
+        public bool IsLastPhaseOfTheTurn() // so `NextPhase` will cause turn resolution
+        {
+            var idx = Sides.IndexOf(CurrentSide);
+            return idx >= Sides.Count - 1;
+        }
+
         public void NextPhase()
         {
             // Toggle side and jump to next turn on occasion.
@@ -496,6 +503,33 @@ namespace YYZ.BlackArmy.Model
             else
             {
                 CurrentSide = Sides[idx + 1];
+            }
+        }
+
+        public IEnumerator NextPhaseIEnum()
+        {
+            // Toggle side and jump to next turn on occasion.
+            var idx = Sides.IndexOf(CurrentSide);
+            if (idx >= Sides.Count - 1)
+            {
+                var ie = ResolveTurnIEnum();
+                while (ie.MoveNext())
+                    yield return null;
+                CurrentSide = Sides[0];
+                Turn += 1;
+            }
+            else
+            {
+                CurrentSide = Sides[idx + 1];
+            }
+        }
+
+        public IEnumerator ResolveTurnIEnum()
+        {
+            for (var i = 0; i < GameParameters.SubTurns; i++)
+            {
+                ResolveSubTurn();
+                yield return null;
             }
         }
 

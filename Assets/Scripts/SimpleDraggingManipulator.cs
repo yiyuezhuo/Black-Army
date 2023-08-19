@@ -35,6 +35,8 @@ public class SimpleDraggingManipulator : IManipulator
         // Debug.Log("PointerDown");
         dragging = true;
         lastPosition = ev.position;
+
+        target.BringToFront();
     }
 
     public void PointerUp(PointerUpEvent ev)

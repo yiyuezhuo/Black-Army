@@ -78,7 +78,7 @@ public class FigurineCanvas : MonoBehaviour
         var figurine = obj.GetComponent<Figurine>();
         figurine.hex = hex;
         figurine.side = side;
-        figurine.clicked.AddListener(gameManager.stackClicked);
+        figurine.clicked.AddListener(gameManager.stackClicked); // TODO: decouple GameManager
 
         figurine.Sync(portrait, text);
     }
