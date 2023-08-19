@@ -127,7 +127,8 @@ public class CombatResolutionController
             Left = left,
             Right = right,
             Tint = message.Combat.Type == YYZ.CombatGenerator.CombatType.Fire ? new Color(255, 255, 0) : new Color(255, 0, 0),
-            CombatTypeSprite=Helpers.GetSprite(message.Result.ResultSummary)
+            CombatTypeSprite=Helpers.GetSprite(message.Result.ResultSummary),
+            CombatTypeTooltip = message.Result.ResultSummary.Name
         };
     }
 
@@ -163,7 +164,6 @@ public class CombatResolutionController
         // var situation = group.Situation;
         var situationDelta = 0f;
 
-        var combatSide0 = isAttacker ? messages[0].Combat.Attacker : messages[0].Combat.Defender;
         foreach (var message in messages)
         {
             var sideMessage = isAttacker ? message.Attacker : message.Defender;
@@ -187,12 +187,27 @@ public class CombatResolutionController
         var totalTactic = 0; // TODO: Add tactic modifier
         var situation = group.Situation - situationDelta;
         var moveSpeed = 0; // TODO: Add Move Speed Modifier
+
+        string chanceS;
+
+        if (messages.Count == 0)
+            chanceS = "-/-";
+        else
+        {
+            var combatSide0 = isAttacker ? messages[0].Combat.Attacker : messages[0].Combat.Defender;
+            // var p1 = combatSide0.BeginChance.Potential.ToString("0.#");
+            // var p2 = combatSide0.BeginChance.Baseline.ToString("0.#");
+            var p1 = combatSide0.BeginChance.Potential.ToString("N0");
+            var p2 = combatSide0.BeginChance.Baseline.ToString("N0");
+            chanceS = $"{p1}/{p2}";
+        }
+
         ui.TextSummary.text = @$"{total} men (-{lost})
 Committed: {committed} pts
 Total Tactic: {totalTactic} (0%)
 Situation: {situation.ToString("P2")} ({situationDelta.ToString("P2")})
 Move Speed: {moveSpeed.ToString("P2")}
-Chance: {combatSide0.BeginChance.Potential.ToString("0.#")}/{combatSide0.BeginChance.Baseline.ToString("0.#")}";
+Chance: {chanceS}";
 
         ui.SubCombatTypes.text = typeCounterS;
         ui.SubCombatResults.text = resultSummaryCounterS;

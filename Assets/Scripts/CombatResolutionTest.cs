@@ -44,7 +44,9 @@ public class CombatResolutionTest : MonoBehaviour
         }
         else
         {
-            foreach (var hex in hexesEngaged.Take(2))
+            // foreach (var hex in hexesEngaged.Take(2))
+            foreach (var hex in hexesEngaged)
+            // foreach (var hex in hexesEngaged.Skip(2))
             {
                 Debug.Log($"hex={hex}");
                 Create(hex);
@@ -55,14 +57,16 @@ public class CombatResolutionTest : MonoBehaviour
 
     void Create(Hex hex)
     {
-        Debug.Log($"hex={hex}");
+        // Debug.Log($"hex={hex}");
 
         var resolver = new Resolver(hex);
         var messages = resolver.Resolve().ToList();
+        /*
         foreach (var message in messages)
         {
             Debug.Log(message);
         }
+        */
 
         var controller = new CombatResolutionController()
         {

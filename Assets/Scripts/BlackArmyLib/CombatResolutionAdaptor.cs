@@ -93,9 +93,14 @@ namespace YYZ.BlackArmy.CombatResolution
         public float AttackerSituationEffect; // 0 -> 0 effect, 1 -> normal retreat effect.
         public float DefenderSituationEffect;
         public string ShortName;
+
+        public override string ToString()
+        {
+            return $"CombatResultSummary({Name}, {LowerLimit}, {AttackerLostLevel}, {DefenderLostLevel}, AttackerSituationEffect={AttackerSituationEffect}, DefenderSituationEffect={DefenderSituationEffect}, ShortName={ShortName})";
+        }
     }
 
-    public class LowerResultSummaryWrapper : CombatGenerator.ICombatResult
+    public class SubCombatResultSummaryWrapper : CombatGenerator.ICombatResult
     {
         public CombatResultSummary Summary;
         public bool AttackerInitiative;
@@ -148,15 +153,15 @@ namespace YYZ.BlackArmy.CombatResolution
                 new(){Name="Repelled",      ShortName="RE",  LowerLimit=0.2f,    AttackerLostLevel=1f,       DefenderLostLevel=0f,       AttackerSituationEffect=0f, DefenderSituationEffect=0}
             },
             DefenderLostResults = new(){
-                new(){Name="Stalemate",     ShortName="ST", LowerLimit= -1f,    AttackerLostLevel=0.5f,     DefenderLostLevel=0.5f,     AttackerSituationEffect=0f, DefenderSituationEffect=0},
-                new(){Name="Soften",        ShortName="SO", LowerLimit= 0.125f, AttackerLostLevel=0.25f,    DefenderLostLevel=0.75f,    AttackerSituationEffect=0f, DefenderSituationEffect=0.2f},
-                new(){Name="Fallback",      ShortName="FA", LowerLimit= 0.25f,  AttackerLostLevel=0f,       DefenderLostLevel=1f,       AttackerSituationEffect=0f, DefenderSituationEffect=1f},
-                new(){Name="Breakthrough",  ShortName="BR", LowerLimit= 0.5f,   AttackerLostLevel=0f,       DefenderLostLevel=2f,       AttackerSituationEffect=0f, DefenderSituationEffect=3f},
-                new(){Name="Overrun",       ShortName="OV", LowerLimit= 1f,     AttackerLostLevel=0f,       DefenderLostLevel=3f,       AttackerSituationEffect=0f, DefenderSituationEffect=5f},
+                new(){Name="Stalemate",     ShortName="ST", LowerLimit= -1f,    AttackerLostLevel=0.5f,     DefenderLostLevel=0.25f,    AttackerSituationEffect=0f, DefenderSituationEffect=0},
+                new(){Name="Soften",        ShortName="SO", LowerLimit= 0.125f, AttackerLostLevel=0.5f,     DefenderLostLevel=0.5f,     AttackerSituationEffect=0f, DefenderSituationEffect=0.2f},
+                new(){Name="Fallback",      ShortName="FA", LowerLimit= 0.25f,  AttackerLostLevel=0.25f,    DefenderLostLevel=0.75f,    AttackerSituationEffect=0f, DefenderSituationEffect=1f},
+                new(){Name="Breakthrough",  ShortName="BR", LowerLimit= 0.5f,   AttackerLostLevel=0f,       DefenderLostLevel=1f,       AttackerSituationEffect=0f, DefenderSituationEffect=3f},
+                new(){Name="Overrun",       ShortName="OV", LowerLimit= 1f,     AttackerLostLevel=0f,       DefenderLostLevel=2f,       AttackerSituationEffect=0f, DefenderSituationEffect=5f},
             }
         };
 
-        public static YYZ.CombatResolution.CombatResolver<CombatResultSummary> LowLevelCombatResolver = new()
+        public static YYZ.CombatResolution.CombatResolver<CombatResultSummary> SubCombatResolver = new()
         {
             AssaultLossTable=new YYZ.CombatResolution.LossTable(){Low=0.02f, High=0.1f},
             FireLossTable=new YYZ.CombatResolution.LossTable(){Low=0.01f, High=0.05f},
@@ -204,12 +209,14 @@ namespace YYZ.BlackArmy.CombatResolution
                 (var attacker, var atkCommitedUnits) = ApplyCommand(combat.Attacker, AttackerGroup.Units);
                 (var defender, var defCommitedUnits) = ApplyCommand(combat.Defender, DefenderGroup.Units);
                 var config = CombatTypeConfigMap[combat.Type];
-                var resolveSetting = new YYZ.CombatResolution.CombatSetting(){Attacker=attacker, Defender=defender, Mode=config.Mode};
+
+                (var active, var passive) = combat.AttackerInitiative ? (attacker, defender) : (defender, attacker);
+                var resolveSetting = new YYZ.CombatResolution.CombatSetting(){Attacker= active, Defender= passive, Mode=config.Mode};
                 
-                var res = LowLevelCombatResolver.Resolve(resolveSetting);
+                var res = SubCombatResolver.Resolve(resolveSetting);
                 
-                combatGenerator.CurrentCombatResult = new LowerResultSummaryWrapper(){Summary=res.ResultSummary, AttackerInitiative=combat.AttackerInitiative};
-                res.ApplyTo(attacker.Units, defender.Units);
+                combatGenerator.CurrentCombatResult = new SubCombatResultSummaryWrapper(){Summary=res.ResultSummary, AttackerInitiative=combat.AttackerInitiative};
+                res.ApplyTo(active.Units, passive.Units);
                 // res.ResultSummary.
                 // var ap = atkCommitedUnits.Sum(u => u.Lost * u.Unit.Width) / atkCommitedUnits.Sum(u => u.Commited * u.Unit.Width);
                 var asDelta = UpdateSituation(AttackerGroup, atkCommitedUnits, res.ResultSummary, combat.AttackerInitiative);

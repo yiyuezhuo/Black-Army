@@ -118,7 +118,9 @@ namespace YYZ.CombatGenerator
         public float JudgementReferneceLevel = 6;
         public float JudgementNoiseCoef = 0.1f;
         public float CombatResultEffectCoef = 1f;
-        public float passiveCorrelation = 0.2f;
+        public float PassiveCorrelation = 0.2f;
+        public float ReservationPercent = 0.25f;
+        public float DensityCheckSmoothConstant = 10f;
 
         /*
         Chance MakeChance(ICombatGroup group)
@@ -158,11 +160,10 @@ namespace YYZ.CombatGenerator
                     BeginBaseline = group.Units.Sum(u => u.Strength * u.Width * baselineTacticalSpeed)
                 };
             }
-
         }
 
         bool BaseProbCheck() => NextFloat() <= BaseBattleProb;
-        bool DensityCheck(float minWidth) => NextFloat() <= minWidth / DensityEffectWidthUpperLimit;
+        bool DensityCheck(float minWidth) => NextFloat() <= (minWidth + DensityCheckSmoothConstant) / DensityEffectWidthUpperLimit;
         bool DeploymentCheck(float command) => NextFloat() <= CommandBase + command * CombatEffectCoef;
         bool SituationCheck(float situation) => NextFloat() <= situation / 2 + 0.5;
         float JudgementNoise(CombatGroupWrapper group)
@@ -191,7 +192,8 @@ namespace YYZ.CombatGenerator
             var attacker = new CombatGroupWrapper(attackerGroup, BaselineTacticalSpeed);
             var defender = new CombatGroupWrapper(defenderGroup, BaselineTacticalSpeed);
 
-            while(attacker.Chance.Potential > 0 || defender.Chance.Potential > 0)
+            while(attacker.Chance.Potential / attacker.Chance.BeginPotential > ReservationPercent || 
+                  defender.Chance.Potential / defender.Chance.BeginPotential > ReservationPercent)
             {
                 var ap = attacker.Chance.Potential;
                 var dp = defender.Chance.Potential;
@@ -218,7 +220,7 @@ namespace YYZ.CombatGenerator
                     continue;
 
                 var passiveAsset = RollCombatAsset(passive.Chance);
-                passiveAsset = passive.Chance.Clamp((1 - passiveCorrelation) * passiveAsset + passiveCorrelation * activeAsset);
+                passiveAsset = passive.Chance.Clamp((1 - PassiveCorrelation) * passiveAsset + PassiveCorrelation * activeAsset);
 
                 if(passiveAsset == 0)
                     yield break;

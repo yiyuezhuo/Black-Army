@@ -37,6 +37,7 @@ public class SubCombatListEntryController
         public SideData Right;
         public Color Tint;
         public Sprite CombatTypeSprite;
+        public string CombatTypeTooltip;
     }
 
     public void SetVisualElement(VisualElement visualElement)
@@ -52,6 +53,9 @@ public class SubCombatListEntryController
         SetData(data.Right, RightUI);
         ResultSummary.style.unityBackgroundImageTintColor = data.Tint;
         ResultSummary.style.backgroundImage = new StyleBackground(data.CombatTypeSprite);
+
+        ResultSummary.tooltip = data.CombatTypeTooltip;
+        ResultSummary.AddManipulator(new TooltipManipulator());
     }
 
     public void SetData(SideData data, SideUI ui)
@@ -60,6 +64,6 @@ public class SubCombatListEntryController
 
         ui.SubCombatSummary.text = $@"Committed: {data.Committed} (-{data.CommittedLost})
 Situation: {data.SituationDelta.ToString("P4")}
-Chance: {data.ChancePotentialDelta}({data.ChanceBaselineDelta})";
+Chance: {data.ChancePotentialDelta.ToString("N0")}({data.ChanceBaselineDelta.ToString("N0")})";
     }
 }
