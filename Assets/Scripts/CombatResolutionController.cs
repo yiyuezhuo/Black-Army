@@ -13,6 +13,10 @@ public class CombatResolutionController
     public int FixedItemHeight;
     public VisualTreeAsset SubCombatLisyEntryTemplate;
 
+    // VisualElement basePanel;
+
+    // VisualElement root;
+
     Label LocationUI;
     Label DateUI;
 
@@ -20,6 +24,8 @@ public class CombatResolutionController
     SymmetryUI RightUI;
 
     public ListView SubCombatListView;
+
+    Button ConfirmButton;
 
     public List<SubCombatListEntryController.Data> SubCombatDataList = new();
 
@@ -32,20 +38,26 @@ public class CombatResolutionController
         public Label SubCombatResults;
         public static SymmetryUI Generate(VisualElement root, string prefix)
         {
+            var leaderStats = root.Q(prefix + "LeaderStats") as Label;
+            leaderStats.AddManipulator(new TooltipManipulator());
+
+            var subCombatResults = root.Q(prefix + "SubCombatResults") as Label;
+            subCombatResults.AddManipulator(new TooltipManipulator());
+
             return new()
             {
                 LeaderPortrait = root.Q(prefix + "LeaderPortrait"),
                 TextSummary = root.Q(prefix + "TextSummary") as Label,
-                LeaderStats = root.Q(prefix + "LeaderStats") as Label,
+                LeaderStats = leaderStats,
                 SubCombatTypes = root.Q(prefix + "SubCombatTypes") as Label,
-                SubCombatResults = root.Q(prefix + "SubCombatResults") as Label
+                SubCombatResults = subCombatResults
             };
         }
     }
 
-    public void Bind(UIDocument doc)
+    public void SetVisualElement(VisualElement root)
     {
-        var root = doc.rootVisualElement;
+        // root = doc.rootVisualElement;
 
         LocationUI = root.Q("Location") as Label;
         DateUI = root.Q("Date") as Label;
@@ -55,6 +67,9 @@ public class CombatResolutionController
         RightUI = SymmetryUI.Generate(root, "Right");
 
         BindSubCombatListView();
+
+        ConfirmButton = root.Q("ConfirmButton") as Button;
+        ConfirmButton.RegisterCallback<ClickEvent>((evt) => root.RemoveFromHierarchy());
 
         root.AddManipulator(new SimpleDraggingManipulator());
     }
@@ -96,8 +111,9 @@ public class CombatResolutionController
         SyncCombatGroup(LeftUI, attackerGroup, messageList, true);
         SyncCombatGroup(RightUI, defenderGroup, messageList, false);
 
-        SubCombatDataList.Clear();
-        SubCombatDataList.AddRange(messageList.Select(message => EncodeSubCombatData(resolver, message)));
+        // SubCombatDataList.Clear();
+        // SubCombatDataList.AddRange(messageList.Select(message => EncodeSubCombatData(resolver, message)));
+        SubCombatListView.itemsSource = SubCombatDataList = messageList.Select(message => EncodeSubCombatData(resolver, message)).ToList();
         // var newSubCombatDataList = messages.
     }
 
@@ -141,8 +157,7 @@ public class CombatResolutionController
         ui.LeaderPortrait.style.backgroundImage = new StyleBackground(p);
         var leaderStats = Helpers.FormatLeaderStats(group.Leader);
         ui.LeaderStats.text = $"{group.Leader.Name}({leaderStats})";
-
-        var total = group.Units.Sum(u => u.Strength);
+        
         var lost = 0;
         var committed = 0;
         // var situation = group.Situation;
@@ -152,16 +167,18 @@ public class CombatResolutionController
         foreach (var message in messages)
         {
             var sideMessage = isAttacker ? message.Attacker : message.Defender;
-            foreach(var unit in sideMessage.UnitsCommitted)
+            situationDelta += sideMessage.SituationDelta;
+
+            foreach (var unit in sideMessage.UnitsCommitted)
             {
                 lost += unit.Lost;
                 committed += unit.Committed;
-                situationDelta += sideMessage.SituationDelta;
             }
-
             // message.Combat.Type;
             // message.Result;
         }
+
+        var total = group.Units.Sum(u => u.Strength) + lost;
 
         var relatedMessages = messages.Where(m => (m.Combat.AttackerInitiative && isAttacker) || (!m.Combat.AttackerInitiative && !isAttacker)).ToList();
         var typeCounterS = string.Join(", ", relatedMessages.GroupBy(m => m.Combat.Type).Select(g => $"{g.Key}:{g.Count()}"));
@@ -173,9 +190,9 @@ public class CombatResolutionController
         ui.TextSummary.text = @$"{total} men (-{lost})
 Committed: {committed} pts
 Total Tactic: {totalTactic} (0%)
-Situation: {situation} ({situationDelta})
-Move Speed: {moveSpeed}
-Chance: {combatSide0.BeginChance.Potential}/{combatSide0.BeginChance.Baseline}";
+Situation: {situation.ToString("P2")} ({situationDelta.ToString("P2")})
+Move Speed: {moveSpeed.ToString("P2")}
+Chance: {combatSide0.BeginChance.Potential.ToString("0.#")}/{combatSide0.BeginChance.Baseline.ToString("0.#")}";
 
         ui.SubCombatTypes.text = typeCounterS;
         ui.SubCombatResults.text = resultSummaryCounterS;

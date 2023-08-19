@@ -12,6 +12,9 @@ public class CombatResolutionTest : MonoBehaviour
 {
     public int FixedItemHeight = 54;
     public VisualTreeAsset SubCombatLisyEntryTemplate;
+    public VisualTreeAsset CombatResolutionTemplate;
+
+    public bool SingleMode = true;
 
     // Start is called before the first frame update
     void Start()
@@ -19,16 +22,42 @@ public class CombatResolutionTest : MonoBehaviour
         var gameState = Provider.state;
 
         var hexesEngaged = gameState.Hexes.Where(IsEngage);
-        // var hexMaxEngaged = hexesEngaged.MaxBy(hex =>
-        var hexMaxEngaged = MaxBy(hexesEngaged, hex =>
-            hex.Detachments.GroupBy(d => d.Side).Select(g =>
-                g.Sum(d => d.GetTotalManpower())
-            ).Min()
-        );
 
-        Debug.Log($"hexesEngaged={hexesEngaged}");
+        /*
+        foreach(var hex in hexesEngaged.Take(2))
+        {
+            Debug.Log($"hex={hex}");
+            Create(hex);
+        }
+        */
+        
+        if(SingleMode)
+        {
+            var hexMaxEngaged = MaxBy(hexesEngaged, hex =>
+                hex.Detachments.GroupBy(d => d.Side).Select(g =>
+                    g.Sum(d => d.GetTotalManpower())
+                ).Min()
+            );
+            Debug.Log($"hexMaxEngaged={hexMaxEngaged}");
 
-        var resolver = new Resolver(hexMaxEngaged);
+            Create(hexMaxEngaged);
+        }
+        else
+        {
+            foreach (var hex in hexesEngaged.Take(2))
+            {
+                Debug.Log($"hex={hex}");
+                Create(hex);
+            }
+        }
+
+    }
+
+    void Create(Hex hex)
+    {
+        Debug.Log($"hex={hex}");
+
+        var resolver = new Resolver(hex);
         var messages = resolver.Resolve().ToList();
         foreach (var message in messages)
         {
@@ -38,10 +67,21 @@ public class CombatResolutionTest : MonoBehaviour
         var controller = new CombatResolutionController()
         {
             SubCombatLisyEntryTemplate = SubCombatLisyEntryTemplate,
-            FixedItemHeight= FixedItemHeight
+            FixedItemHeight = FixedItemHeight
         };
+
         var doc = GetComponent<UIDocument>();
-        controller.Bind(doc);
+        VisualElement element;
+        if(SingleMode)
+        {
+            element = doc.rootVisualElement;
+        }
+        else
+        {
+            element = CombatResolutionTemplate.Instantiate();
+            doc.rootVisualElement.Add(element);
+        }
+        controller.SetVisualElement(element);
         controller.Sync(resolver, messages);
     }
 

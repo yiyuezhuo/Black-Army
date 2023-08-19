@@ -59,7 +59,7 @@ public class SubCombatListEntryController
         ui.Flag.style.backgroundImage = new StyleBackground(data.Flag);
 
         ui.SubCombatSummary.text = $@"Committed: {data.Committed} (-{data.CommittedLost})
-Situation: {data.SituationDelta}
+Situation: {data.SituationDelta.ToString("P4")}
 Chance: {data.ChancePotentialDelta}({data.ChanceBaselineDelta})";
     }
 }
