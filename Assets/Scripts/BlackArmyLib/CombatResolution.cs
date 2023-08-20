@@ -236,7 +236,7 @@ namespace YYZ.CombatResolution
             var atkLossPercent = 1 - toAtkTotalWidth / atkTotalWidth;
             var defLossPercent = 1 - toDefTotalWidth / defTotalWidth;
             var res = ResultResolver.Resolve(atkLossPercent, defLossPercent, attacker.Morale, defender.Morale);
-            UnityEngine.Debug.Log($"res={res}");
+            // UnityEngine.Debug.Log($"res={res}");
             return new()
             {
                 AttackerUpdates=atkUpdates, DefenderUpdates=defUpdates, ResultSummary=res
@@ -276,7 +276,7 @@ namespace YYZ.CombatResolution
             {
                 var ap = GetModifiedPercent(attackerLossPercent, attackerMorale);
                 var aIdx = AttackerLostResults.FindIndex((res) => ap < res.LowerLimit);
-                UnityEngine.Debug.Log($"attackerLossPercent={attackerLossPercent}, ap={ap}, aIdx={aIdx}, attackerMorale={attackerMorale}");
+                // UnityEngine.Debug.Log($"attackerLossPercent={attackerLossPercent}, ap={ap}, aIdx={aIdx}, attackerMorale={attackerMorale}");
                 if(aIdx == -1)
                     return AttackerLostResults[^1];
                 else if(aIdx >= 1)
@@ -284,7 +284,7 @@ namespace YYZ.CombatResolution
                 
                 var dp = GetModifiedPercent(denfenderLossPercent, defenderMorale);
                 var dIdx = DefenderLostResults.FindIndex((res) => dp < res.LowerLimit);
-                UnityEngine.Debug.Log($"denfenderLossPercent={denfenderLossPercent}, dp={dp}, dIdx={dIdx}, defenderMorale={defenderMorale}");
+                // UnityEngine.Debug.Log($"denfenderLossPercent={denfenderLossPercent}, dp={dp}, dIdx={dIdx}, defenderMorale={defenderMorale}");
                 if (dIdx == -1)
                     return DefenderLostResults[^1];
                 return DefenderLostResults[dIdx - 1];

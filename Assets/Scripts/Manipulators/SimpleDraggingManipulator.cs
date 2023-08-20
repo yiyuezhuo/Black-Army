@@ -22,17 +22,27 @@ public class SimpleDraggingManipulator : IManipulator
                 _target.UnregisterCallback<PointerDownEvent>(PointerDown);
                 _target.UnregisterCallback<PointerUpEvent>(PointerUp);
                 _target.UnregisterCallback<PointerMoveEvent>(PointerMove);
+                _target.UnregisterCallback<PointerLeaveEvent>(PointerLeave);
             }
             _target = value;
+            
             _target.RegisterCallback<PointerDownEvent>(PointerDown);
             _target.RegisterCallback<PointerUpEvent>(PointerUp);
             _target.RegisterCallback<PointerMoveEvent>(PointerMove);
+            _target.RegisterCallback<PointerLeaveEvent>(PointerLeave); // TODO: Find a better method to handle big mouse movement.
+            
+            /*
+            _target.RegisterCallback<PointerDownEvent>(PointerDown, TrickleDown.TrickleDown);
+            _target.RegisterCallback<PointerUpEvent>(PointerUp, TrickleDown.TrickleDown);
+            _target.RegisterCallback<PointerMoveEvent>(PointerMove, TrickleDown.TrickleDown);
+            */
+
         }
     }
 
     public void PointerDown(PointerDownEvent ev)
     {
-        // Debug.Log("PointerDown");
+        Debug.Log("PointerDown");
         dragging = true;
         lastPosition = ev.position;
 
@@ -41,17 +51,27 @@ public class SimpleDraggingManipulator : IManipulator
 
     public void PointerUp(PointerUpEvent ev)
     {
-        // Debug.Log("PointerUp");
+        Debug.Log("PointerUp");
         dragging = false;
+    }
+
+    public void PointerLeave(PointerLeaveEvent ev)
+    {
+        Follow(ev.position);
     }
 
     public void PointerMove(PointerMoveEvent ev)
     {
         // Debug.Log("PointerMove");
-        if(dragging)
+        Follow(ev.position);
+    }
+
+    public void Follow(Vector3 position)
+    {
+        if (dragging)
         {
-            var delta = ev.position - lastPosition;
-            lastPosition = ev.position;
+            var delta = position - lastPosition;
+            lastPosition = position;
             target.transform.position += delta;
         }
     }

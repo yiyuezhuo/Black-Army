@@ -14,7 +14,14 @@ public class CombatResolutionTest : MonoBehaviour
     public VisualTreeAsset SubCombatLisyEntryTemplate;
     public VisualTreeAsset CombatResolutionTemplate;
 
-    public bool SingleMode = true;
+    public Mode TestMode;
+
+    public enum Mode
+    {
+        Single,
+        Multiple,
+        Event
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -31,26 +38,29 @@ public class CombatResolutionTest : MonoBehaviour
         }
         */
         
-        if(SingleMode)
+        switch(TestMode)
         {
-            var hexMaxEngaged = MaxBy(hexesEngaged, hex =>
-                hex.Detachments.GroupBy(d => d.Side).Select(g =>
-                    g.Sum(d => d.GetTotalManpower())
-                ).Min()
-            );
-            Debug.Log($"hexMaxEngaged={hexMaxEngaged}");
+            case Mode.Single:
+                var hexMaxEngaged = MaxBy(hexesEngaged, hex =>
+                    hex.Detachments.GroupBy(d => d.Side).Select(g =>
+                        g.Sum(d => d.GetTotalManpower())
+                    ).Min()
+                );
+                Debug.Log($"hexMaxEngaged={hexMaxEngaged}");
 
-            Create(hexMaxEngaged);
-        }
-        else
-        {
-            // foreach (var hex in hexesEngaged.Take(2))
-            foreach (var hex in hexesEngaged)
-            // foreach (var hex in hexesEngaged.Skip(2))
-            {
-                Debug.Log($"hex={hex}");
-                Create(hex);
-            }
+                Create(hexMaxEngaged);
+                break;
+            case Mode.Multiple:
+                // foreach (var hex in hexesEngaged.Take(2))
+                foreach (var hex in hexesEngaged)
+                // foreach (var hex in hexesEngaged.Skip(2))
+                {
+                    Debug.Log($"hex={hex}");
+                    Create(hex);
+                }
+                break;
+            case Mode.Event:
+                break;
         }
 
     }
@@ -68,6 +78,12 @@ public class CombatResolutionTest : MonoBehaviour
         }
         */
 
+        Create(resolver, messages);
+
+    }
+
+    void Create(Resolver resolver, List<Resolver.ResolveMessage> messages)
+    {
         var controller = new CombatResolutionController()
         {
             SubCombatLisyEntryTemplate = SubCombatLisyEntryTemplate,
@@ -76,7 +92,7 @@ public class CombatResolutionTest : MonoBehaviour
 
         var doc = GetComponent<UIDocument>();
         VisualElement element;
-        if(SingleMode)
+        if (TestMode == Mode.Single)
         {
             element = doc.rootVisualElement;
         }
@@ -87,6 +103,8 @@ public class CombatResolutionTest : MonoBehaviour
         }
         controller.SetVisualElement(element);
         controller.Sync(resolver, messages);
+
+        element.AddManipulator(new SimpleDraggingManipulator());
     }
 
     // TODO: Merge implementation

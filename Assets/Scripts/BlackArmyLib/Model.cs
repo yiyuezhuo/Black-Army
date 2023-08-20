@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Collections;
+using YYZ.BlackArmy.CombatResolution;
 
 namespace YYZ.BlackArmy.Model
 {
@@ -338,6 +339,8 @@ namespace YYZ.BlackArmy.Model
         {
             return $"Hex({X}, {Y}, {Type}, Edges:[{EdgeMap.Count}], Detachments:[{Detachments.Count}])";
         }
+
+        public bool IsEngage() => Detachments.GroupBy(d => d.Side).Count() > 1;
     }
 
     public class MovingState
@@ -426,6 +429,7 @@ namespace YYZ.BlackArmy.Model
         }
 
         public int GetTotalManpower() => Elements.GetTotalManpower() + Leaders.Count; // TODO: Add Leader?
+        public int GetTotalManpowerNonLeader() => Elements.GetTotalManpower();
 
         public void TransferTo(Detachment dst, Leader leader)
         {
@@ -434,6 +438,15 @@ namespace YYZ.BlackArmy.Model
         }
 
         public bool IsEmpty() => Leaders.Count == 0 && Elements.Elements.Count == 0;
+        public bool IsEmptyNonLeader() => Elements.Elements.Count == 0;
+
+        public void Disband()
+        {
+            // Even it's destroyed, its reference may be hold by combat reporter tempoerately
+            Side.Detachments.Remove(this);
+            Hex.Detachments.Remove(this);
+            // Set leader states here? Captured?
+        }
     }
 
     public static class GameParameters
@@ -453,9 +466,12 @@ namespace YYZ.BlackArmy.Model
         public DateTime BeginDateTime = new DateTime(1920, 11, 26);
         public DateTime CurrentDateTime{get => BeginDateTime + TimeSpan.FromDays(Turn - 1);}
 
+        public bool Ceasefire = false; // for now it's mainly debug purpose.
+
         public List<ElementCategory> ElementCategories;
         public ElementTypeSystem ElementTypeSystem;
 
+        public event EventHandler<CombatMessage> CombatResolved;
         
         public static List<RuleOfEngagement> RoEList = new() // [0] is the default one
         {
@@ -544,11 +560,41 @@ namespace YYZ.BlackArmy.Model
             // Turn End Processing
         }
 
+        // public static bool IsEngage(Hex hex) => hex.Detachments.GroupBy(d => d.Side).Count() > 1;
+
+        public class CombatMessage
+        {
+            public Resolver Resolver;
+            public List<Resolver.ResolveMessage> Messages;
+        }
+
         public void ResolveSubTurn()
         {
             foreach(var detachment in Detachments)
             {
                 detachment.ResolveSubTurn();
+            }
+
+            if(!Ceasefire)
+            {
+                var hexMaxEngaged = Hexes.Where(hex => hex.IsEngage());
+                foreach(var hex in hexMaxEngaged)
+                {
+                    var resolver = new Resolver(hex);
+                    var messages = resolver.Resolve().ToList();
+                    CombatResolved?.Invoke(this, new CombatMessage() { Resolver=resolver, Messages=messages});
+                }
+                foreach(var hex in hexMaxEngaged)
+                {
+                    var detachments = new List<Detachment>(hex.Detachments);
+                    foreach(var detachment in detachments)
+                    {
+                        if(detachment.IsEmptyNonLeader())
+                        {
+                            detachment.Disband();
+                        }
+                    }
+                }
             }
         }
 

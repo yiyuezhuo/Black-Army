@@ -26,3 +26,23 @@ Label {
 .sub-combat-row {
     margin-top: 5px;
 }
+
+.tab {
+    background-color: rgba(212, 212, 212, 255);
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-left: 1px;
+    margin-right: 1px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.selectedTab.tab {
+    background-color: rgba(106, 106, 106, 255);
+}
+
+.unselectedContent {
+    display: none;
+}

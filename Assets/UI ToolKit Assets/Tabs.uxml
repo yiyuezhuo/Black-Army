@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20ToolKit%20Assets/Runtime.uss?fileID=7433441132597879392&amp;guid=d1a58c8e52f103347b8c51d96ae7a344&amp;type=3#Runtime" />
+    <ui:VisualElement name="Background">
+        <ui:VisualElement name="TabsRow" style="flex-direction: row;">
+            <ui:Label text="Label" display-tooltip-when-elided="true" class="tab" />
+            <ui:Label text="Label" display-tooltip-when-elided="true" class="tab" />
+            <ui:Label text="Label" display-tooltip-when-elided="true" class="tab selectedTab" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Content" style="position: relative;">
+            <ui:VisualElement style="background-color: rgb(129, 185, 238); width: 100px; height: 100px;" />
+            <ui:VisualElement class="unselectedContent" style="background-color: rgb(109, 255, 168); width: 100px; height: 100px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

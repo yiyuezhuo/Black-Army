@@ -128,7 +128,7 @@ namespace YYZ.BlackArmy.CombatResolution
         {
             var unitsCommited = groupCommand.Units.Zip(units, (command, unit) => new UnitCommitted(unit, command.Strength)).ToList();
             var manpower = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength);
-            var morale = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength * u.Unit.Type.Morale) / manpower;
+            var morale = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength * u.Unit.Type.Morale) / manpower; // TODO: 0 issue
             var combatSide = new YYZ.CombatResolution.ConmbatSide(){Units=unitsCommited, Morale=morale};
             return (combatSide, unitsCommited);
         }

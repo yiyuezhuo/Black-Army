@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20ToolKit%20Assets/Runtime.uss?fileID=7433441132597879392&amp;guid=d1a58c8e52f103347b8c51d96ae7a344&amp;type=3#Runtime" />
-    <ui:VisualElement name="BackgroundPanel" style="color: rgb(255, 255, 255); -unity-text-outline-color: rgb(56, 56, 56); background-color: rgb(56, 56, 56); bottom: auto; position: absolute; height: auto; width: 600px; max-height: 700px;">
+    <ui:VisualElement name="BackgroundPanel" style="color: rgb(255, 255, 255); -unity-text-outline-color: rgb(56, 56, 56); background-color: rgb(56, 56, 56); bottom: auto; position: relative; height: auto; width: 600px; max-height: 700px;">
         <ui:Label text="The Combat in Gulyai-Polye" display-tooltip-when-elided="true" name="Location" style="-unity-text-align: upper-center; font-size: 28px;" />
         <ui:Label text="1/1/1921" display-tooltip-when-elided="true" name="Date" style="-unity-text-align: upper-center; font-size: 20px;" />
         <ui:VisualElement name="InfoRow" style="flex-direction: row; flex-shrink: 0;">
