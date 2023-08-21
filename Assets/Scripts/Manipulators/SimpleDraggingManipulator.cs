@@ -42,7 +42,7 @@ public class SimpleDraggingManipulator : IManipulator
 
     public void PointerDown(PointerDownEvent ev)
     {
-        Debug.Log("PointerDown");
+        // Debug.Log("PointerDown");
         dragging = true;
         lastPosition = ev.position;
 
@@ -51,7 +51,7 @@ public class SimpleDraggingManipulator : IManipulator
 
     public void PointerUp(PointerUpEvent ev)
     {
-        Debug.Log("PointerUp");
+        // Debug.Log("PointerUp");
         dragging = false;
     }
 

@@ -240,6 +240,7 @@ MonoBehaviour:
   FixedItemHeight: 54
   SubCombatLisyEntryTemplate: {fileID: 9197481963319205126, guid: 5bdc6678ed94b8048b80f6d1ef24fb55, type: 3}
   CombatResolutionTemplate: {fileID: 9197481963319205126, guid: ebeabd0f8b390f048b9b5d129046333c, type: 3}
+  StrengthStatsRowTemplate: {fileID: 9197481963319205126, guid: 5bdc6678ed94b8048b80f6d1ef24fb55, type: 3}
   TabsTemplate: {fileID: 9197481963319205126, guid: 41c381d8e86e42441b35beec32e15a7e, type: 3}
 --- !u!114 &2134862130
 MonoBehaviour:

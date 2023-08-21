@@ -13,6 +13,7 @@ public class CombatResolutionTest : MonoBehaviour
     public int FixedItemHeight = 54;
     public VisualTreeAsset SubCombatLisyEntryTemplate;
     public VisualTreeAsset CombatResolutionTemplate;
+    public VisualTreeAsset StrengthStatsRowTemplate;
 
     public Mode TestMode;
 
@@ -87,6 +88,7 @@ public class CombatResolutionTest : MonoBehaviour
         var controller = new CombatResolutionController()
         {
             SubCombatLisyEntryTemplate = SubCombatLisyEntryTemplate,
+            // StrengthStatsRowTemplate = StrengthStatsRowTemplate,
             FixedItemHeight = FixedItemHeight
         };
 

@@ -14,6 +14,7 @@ public class CombatResolutionMergerTest : MonoBehaviour
 
     public VisualTreeAsset SubCombatLisyEntryTemplate;
     public VisualTreeAsset CombatResolutionTemplate;
+    public VisualTreeAsset StrengthStatsRowTemplate;
     public VisualTreeAsset TabsTemplate;
 
     UIDocument doc;
@@ -40,6 +41,8 @@ public class CombatResolutionMergerTest : MonoBehaviour
             foreach (var data in group)
             {
                 (var subTurnElement, var subTurnController) = CreateCombatResolution(data);
+                subTurnController.ConfirmButton.RegisterCallback<ClickEvent>(evt => tabElement.RemoveFromHierarchy());
+
                 elements.Add((idx.ToString(), subTurnElement));
                 idx++;
             }
@@ -47,6 +50,7 @@ public class CombatResolutionMergerTest : MonoBehaviour
             controller.SetData(elements);
             tabElement.AddManipulator(new SimpleDraggingManipulator());
             tabElement.style.position = Position.Absolute;
+
             doc.rootVisualElement.Add(tabElement);
         }
     }
@@ -63,7 +67,7 @@ public class CombatResolutionMergerTest : MonoBehaviour
 
     public void OnCombatResolved(object sender, GameState.CombatMessage combatMessage)
     {
-        Debug.Log(combatMessage);
+        // Debug.Log(combatMessage);
 
         /*
         (var element, var controller) = CreateCombatResolution(combatMessage);
@@ -79,6 +83,7 @@ public class CombatResolutionMergerTest : MonoBehaviour
         var controller = new CombatResolutionController()
         {
             SubCombatLisyEntryTemplate = SubCombatLisyEntryTemplate,
+            // StrengthStatsRowTemplate= StrengthStatsRowTemplate,
             FixedItemHeight = FixedItemHeight
         };
         var element = CombatResolutionTemplate.Instantiate();

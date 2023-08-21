@@ -16,18 +16,22 @@ public class TooltipManipulator : Manipulator
 
     protected override void RegisterCallbacksOnTarget()
     {
+        // Debug.Log("RegisterCallbacksOnTarget");
         target.RegisterCallback<MouseEnterEvent>(MouseIn);
         target.RegisterCallback<MouseOutEvent>(MouseOut);
     }
 
     protected override void UnregisterCallbacksFromTarget()
     {
+        // Debug.Log("UnregisterCallbacksFromTarget");
         target.UnregisterCallback<MouseEnterEvent>(MouseIn);
         target.UnregisterCallback<MouseOutEvent>(MouseOut);
     }
 
     private void MouseIn(MouseEnterEvent e)
     {
+        // Debug.Log("MouseIn");
+
         if (element == null)
         {
             element = new VisualElement();
@@ -54,6 +58,12 @@ public class TooltipManipulator : Manipulator
 
     private void MouseOut(MouseOutEvent e)
     {
-        element.style.visibility = Visibility.Hidden;
+        // Debug.Log("MouseOut");
+
+        // UnregisterCallbacksFromTarget();
+        if (element != null)
+            element.RemoveFromHierarchy();
+        element = null;
+        // element.style.visibility = Visibility.Hidden;
     }
 }

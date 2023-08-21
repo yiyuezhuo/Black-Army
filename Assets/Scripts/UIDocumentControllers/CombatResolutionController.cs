@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 using YYZ.BlackArmy.CombatResolution;
@@ -11,11 +9,13 @@ using YYZ.CombatGenerator;
 using YYZ.CombatResolution;
 using static CombatResolutionController.SnapshotData;
 using static YYZ.BlackArmy.CombatResolution.Resolver;
+using YYZ.BlackArmy.Model;
 
 public class CombatResolutionController
 {
     public int FixedItemHeight;
     public VisualTreeAsset SubCombatLisyEntryTemplate;
+    // public VisualTreeAsset StrengthStatsRowTemplate;
 
     // VisualElement basePanel;
 
@@ -27,11 +27,16 @@ public class CombatResolutionController
     SymmetryUI LeftUI;
     SymmetryUI RightUI;
 
+    VisualElement CategorySummaryGrid;
+
     public ListView SubCombatListView;
 
-    Button ConfirmButton;
+    public Button ConfirmButton;
 
     public List<SubCombatListEntryController.Data> SubCombatDataList = new();
+
+    public float CategoryStatsCellWidth = 10f; // 10% * 8
+    public float CategoryStatsLabelWidth = 19f;
 
     class SymmetryUI
     {
@@ -70,6 +75,8 @@ public class CombatResolutionController
         LeftUI = SymmetryUI.Generate(root, "Left");
         RightUI = SymmetryUI.Generate(root, "Right");
 
+        CategorySummaryGrid = root.Q("CategorySummaryGrid");
+
         BindSubCombatListView();
 
         ConfirmButton = root.Q("ConfirmButton") as Button;
@@ -100,30 +107,6 @@ public class CombatResolutionController
 
     public void Sync(YYZ.BlackArmy.CombatResolution.Resolver resolver, IEnumerable<ResolveMessage> messages)
     {
-        /*
-        var messageList = messages.ToList();
-
-        var gameState = Provider.state;
-        var hex = resolver.Hex;
-        var name = $"({hex.X},{hex.Y})";
-        LocationUI.text = $"The Combat in {name}";
-        DateUI.text = gameState.CurrentDateTime.ToString("dddd, dd MMMM yyyy"); // TODO: sub turn handling
-                                                                                // resolver.AttackerGroup.Leader
-                                                                                // resolver.AttackerGroup.Leader.Name;
-        var attackerGroup = resolver.AttackerGroup;
-        var defenderGroup = resolver.DefenderGroup;
-
-        SyncCombatGroup(LeftUI, attackerGroup, messageList, true);
-        SyncCombatGroup(RightUI, defenderGroup, messageList, false);
-
-        // SubCombatDataList.Clear();
-        // SubCombatDataList.AddRange(messageList.Select(message => EncodeSubCombatData(resolver, message)));
-        SubCombatListView.itemsSource = SubCombatDataList = messageList.Select(message => EncodeSubCombatData(resolver, message)).ToList();
-        // var newSubCombatDataList = messages.
-        */
-
-        // ---------
-
         var data = new SnapshotData(resolver, messages);
         Sync(data);
     }
@@ -136,8 +119,76 @@ public class CombatResolutionController
         SyncCombatGroup(LeftUI, data.AttackerData);
         SyncCombatGroup(RightUI, data.DefenderData);
 
+        CategorySummaryGrid.Clear();
+        foreach (var category in Provider.state.ElementCategories)
+        {
+            var aHas = data.AttackerData.CategoryStatsMap.ContainsKey(category);
+            var dHas = data.DefenderData.CategoryStatsMap.ContainsKey(category);
+            if(!aHas && !dHas)
+                continue;
+            if (!data.AttackerData.CategoryStatsMap.TryGetValue(category, out var aVal))
+                aVal = new();
+            if (!data.DefenderData.CategoryStatsMap.TryGetValue(category, out var dVal))
+                dVal = new();
+
+            CreateLabelsFor(aVal);
+            CreateLabel(category.Name);
+            CreateLabelsFor(dVal);
+
+
+            /*
+            var row = StrengthStatsRowTemplate.Instantiate();
+
+            SetStrengthValue(row.Q("StrengthStatsLeft"), aVal);
+            SetStrengthValue(row.Q("StrengthStatsRight"), dVal);
+
+            CategorySummaryGrid.Add(row);
+            */
+        }
+
         SubCombatListView.itemsSource = SubCombatDataList = data.SubCombatDataList;
     }
+
+    void CreateLabelsFor(CombatGroupData.StrengthStats val)
+    {
+        CreateCell(val.Total);
+        CreateCell(val.Committed);
+        CreateCell(val.Lost);
+        CreateCell(val.Remain);
+    }
+
+    public void CreateCell(int num)
+    {
+        var label = CreateLabel();
+        label.style.width = Length.Percent(CategoryStatsCellWidth);
+        label.text = num.ToString();
+        CategorySummaryGrid.Add(label);
+    }
+
+    public void CreateLabel(string name)
+    {
+        var label = CreateLabel();
+        label.style.width = Length.Percent(CategoryStatsLabelWidth);
+        label.text = name;
+        CategorySummaryGrid.Add(label);
+    }
+
+    public Label CreateLabel()
+    {
+        var label = new Label();
+        label.style.unityTextAlign = TextAnchor.MiddleCenter;
+        return label;
+    }
+
+    /*
+    void SetStrengthValue(VisualElement el, CombatGroupData.StrengthStats val)
+    {
+        (el.Q("Total") as Label).text = val.Total.ToString();
+        (el.Q("Commit") as Label).text = val.Committed.ToString();
+        (el.Q("Lost") as Label).text = val.Lost.ToString();
+        (el.Q("Remain") as Label).text = val.Remain.ToString();
+    }
+    */
 
     public class SnapshotData
     {
@@ -157,14 +208,6 @@ public class CombatResolutionController
 
             LocationName = $"({hex.X},{hex.Y})";
             Date = gameState.CurrentDateTime;
-
-            /*
-            var attackerGroup = resolver.AttackerGroup;
-            var defenderGroup = resolver.DefenderGroup;
-
-            SyncCombatGroup(LeftUI, attackerGroup, messageList, true);
-            SyncCombatGroup(RightUI, defenderGroup, messageList, false);
-            */
 
             AttackerData = CombatGroupData.Create(resolver.AttackerGroup, messageList, true);
             DefenderData = CombatGroupData.Create(resolver.DefenderGroup, messageList, false);
@@ -223,6 +266,15 @@ public class CombatResolutionController
             public float BeginBaselineChance;
             public (CombatType, int)[] TypeCounter;
             public (CombatResultSummary, int)[] ResultSummaryCounter;
+            public Dictionary<ElementCategory, StrengthStats> CategoryStatsMap;
+
+            public class StrengthStats
+            {
+                public int Lost;
+                public int Committed;
+                public int Total;
+                public int Remain { get => Total - Lost; }
+            }
 
             public static CombatGroupData Create(CombatGroup group, List<ResolveMessage> messages, bool isAttacker)
             {
@@ -232,6 +284,8 @@ public class CombatResolutionController
                 var committed = 0;
                 // var situation = group.Situation;
                 var situationDelta = 0f;
+
+                var categoryMap = new Dictionary<ElementCategory, StrengthStats>();
 
                 foreach (var message in messages)
                 {
@@ -245,6 +299,26 @@ public class CombatResolutionController
                     }
                     // message.Combat.Type;
                     // message.Result;
+
+                    foreach(var g in sideMessage.UnitsCommitted.GroupBy(unit => unit.Unit.Type.Category))
+                    {
+                        if (!categoryMap.TryGetValue(g.Key, out var value))
+                            categoryMap[g.Key] = value = new StrengthStats();
+                        foreach(var unit in g)
+                        {
+                            value.Lost += unit.Lost;
+                            value.Committed += unit.Committed;
+                        }
+                    }
+                    // TODO: Use category value to compute "total" value directly
+                }
+
+                foreach(var g in group.Units.GroupBy(u => u.Type.Category))
+                {
+                    if(!categoryMap.TryGetValue(g.Key, out var value))
+                        categoryMap[g.Key] = value = new StrengthStats();
+                    foreach(var unit in g)
+                        value.Total += unit.Strength + value.Lost;
                 }
 
                 var total = group.Units.Sum(u => u.Strength) + lost;
@@ -282,6 +356,7 @@ public class CombatResolutionController
                     BeginBaselineChance= beginBaselineChance,
                     TypeCounter = typeCounter,
                     ResultSummaryCounter= resultSummaryCounter,
+                    CategoryStatsMap= categoryMap
                 };
             }
         }
@@ -303,67 +378,4 @@ Chance: {chanceS}";
         ui.SubCombatTypes.text = string.Join(",", groupData.TypeCounter.Select(tv=>$"{tv.Item1}:{tv.Item2}"));
         ui.SubCombatResults.text = string.Join(",", groupData.ResultSummaryCounter.Select(rv => $"{rv.Item1.ShortName}:{rv.Item2}"));
     }
-
-    /*
-    void SyncCombatGroup(SymmetryUI ui, CombatGroup group, List<ResolveMessage> messages, bool isAttacker)
-    {
-        var p = Helpers.GetSprite(group.Leader, group.Side);
-        ui.LeaderPortrait.style.backgroundImage = new StyleBackground(p);
-        var leaderStats = Helpers.FormatLeaderStats(group.Leader);
-        ui.LeaderStats.text = $"{group.Leader.Name}({leaderStats})";
-        
-        var lost = 0;
-        var committed = 0;
-        // var situation = group.Situation;
-        var situationDelta = 0f;
-
-        foreach (var message in messages)
-        {
-            var sideMessage = isAttacker ? message.Attacker : message.Defender;
-            situationDelta += sideMessage.SituationDelta;
-
-            foreach (var unit in sideMessage.UnitsCommitted)
-            {
-                lost += unit.Lost;
-                committed += unit.Committed;
-            }
-            // message.Combat.Type;
-            // message.Result;
-        }
-
-        var total = group.Units.Sum(u => u.Strength) + lost;
-
-        var relatedMessages = messages.Where(m => (m.Combat.AttackerInitiative && isAttacker) || (!m.Combat.AttackerInitiative && !isAttacker)).ToList();
-        var typeCounterS = string.Join(", ", relatedMessages.GroupBy(m => m.Combat.Type).Select(g => $"{g.Key}:{g.Count()}"));
-        var resultSummaryCounterS = string.Join(", ", relatedMessages.GroupBy(m => m.Result.ResultSummary).Select(g=>$"{g.Key.ShortName}:{g.Count()}"));
-
-        var totalTactic = 0; // TODO: Add tactic modifier
-        var situation = group.Situation - situationDelta;
-        var moveSpeed = 0; // TODO: Add Move Speed Modifier
-
-        string chanceS;
-
-        if (messages.Count == 0)
-            chanceS = "-/-";
-        else
-        {
-            var combatSide0 = isAttacker ? messages[0].Combat.Attacker : messages[0].Combat.Defender;
-            // var p1 = combatSide0.BeginChance.Potential.ToString("0.#");
-            // var p2 = combatSide0.BeginChance.Baseline.ToString("0.#");
-            var p1 = combatSide0.BeginChance.Potential.ToString("N0");
-            var p2 = combatSide0.BeginChance.Baseline.ToString("N0");
-            chanceS = $"{p1}/{p2}";
-        }
-
-        ui.TextSummary.text = @$"{total} men (-{lost})
-Committed: {committed} pts
-Total Tactic: {totalTactic} (0%)
-Situation: {situation.ToString("P2")} ({situationDelta.ToString("P2")})
-Move Speed: {moveSpeed.ToString("P2")}
-Chance: {chanceS}";
-
-        ui.SubCombatTypes.text = typeCounterS;
-        ui.SubCombatResults.text = resultSummaryCounterS;
-    }
-    */
 }
