@@ -13,7 +13,7 @@ public class MoveLine : MonoBehaviour
     private void Awake()
     {
         line = GetComponent<LineRenderer>();
-        Debug.Log($"line={line}");
+        // Debug.Log($"line={line}");
     }
 
     // Start is called before the first frame update

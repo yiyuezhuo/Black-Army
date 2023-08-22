@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
         lastSelectedHex = hex;
         var detachment = currentSideStack[currentSelectingIdx];
 
-        Debug.Log($"currentSideStack.Count={currentSideStack.Count}, currentSelectingIdx={currentSelectingIdx}, hex == lastSelectedHex:{hex == lastSelectedHex}");
+        // Debug.Log($"currentSideStack.Count={currentSideStack.Count}, currentSelectingIdx={currentSelectingIdx}, hex == lastSelectedHex:{hex == lastSelectedHex}");
 
         OnDetachmentSelected(detachment);
         detachmentSelected.Invoke(detachment);

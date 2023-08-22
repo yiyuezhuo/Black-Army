@@ -542,22 +542,57 @@ namespace YYZ.BlackArmy.Model
 
         public IEnumerator ResolveTurnIEnum()
         {
+            PreProcess();
+
             for (var i = 0; i < GameParameters.SubTurns; i++)
             {
                 ResolveSubTurn();
                 yield return null;
             }
+
+            PostProcess();
         }
 
         public void ResolveTurn()
         {
             // Turn Begin Processing
+            PreProcess();
 
             // Successive Sub Turn Resolv
-            for(var i=0; i<GameParameters.SubTurns; i++)
+            for (var i=0; i<GameParameters.SubTurns; i++)
                 ResolveSubTurn();
-            
+
             // Turn End Processing
+            PostProcess();
+        }
+
+        public void PreProcess()
+        {
+
+        }
+
+        public void _PostProcess()
+        {
+
+        }
+
+        public void PostProcess()
+        {
+            
+            foreach(var hex in Hexes)
+            {
+                if(!hex.IsEngage())
+                {
+                    foreach(var v in hex.SideValueMap.Values)
+                    {
+                        var absS = MathF.Abs(v.Situation);
+                        var sign = MathF.Sign(v.Situation);
+                        var delta = sign * MathF.Min(absS, MathF.Max(0.01f, absS / 2));
+                        v.Situation -= delta;
+                    }
+                }
+            }
+            
         }
 
         // public static bool IsEngage(Hex hex) => hex.Detachments.GroupBy(d => d.Side).Count() > 1;

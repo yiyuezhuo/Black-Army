@@ -30,6 +30,8 @@ namespace YYZ.CombatGenerator
 
         // Area/global properties
         public float Situation{get; set;} // -100%~100% (-1.0 ~ +1.0)
+
+        public bool IsEmpty() => Units.Sum(u => u.Strength) == 0;
     }
 
     public class Chance
@@ -48,7 +50,9 @@ namespace YYZ.CombatGenerator
             get => BeginBaseline * percent;
             set => percent = value / BeginBaseline;
         }
-        public float Clamp(float x) => MathF.Min(Potential, MathF.Min(Baseline, x));
+        // public float Clamp(float x) => MathF.Min(Potential, MathF.Min(Baseline, x));
+        public float ClampPotential(float x) => MathF.Min(Potential, x);
+        public float ClampBaseline(float x) => MathF.Min(Baseline, x);
     }
 
     public class ChanceSnapshot
@@ -119,24 +123,14 @@ namespace YYZ.CombatGenerator
         public float JudgementNoiseCoef = 0.1f;
         public float CombatResultEffectCoef = 1f;
         public float PassiveCorrelation = 0.2f;
-        public float ReservationPercent = 0.25f;
+        public float ReservationPercent = 0.4f;
         public float DensityCheckSmoothConstant = 10f;
-
-        /*
-        Chance MakeChance(ICombatGroup group)
-        {
-            return new Chance()
-            {
-                BeginPotential = group.Units.Sum(u => u.Strength * u.Width * u.TacticSpeed),
-                BeginBaseline = group.Units.Sum(u => u.Strength * u.Width * BaselineTacticalSpeed)
-            };
-        }
-        */
+        public float CommandPassiveAssetComsuptionCoef = 0.1f;
 
         float RollCombatAsset(Chance chance)
         {
             var r = NextFloat() *(CombatChanceUpperLimit - CombatChanceLowerLimit) + CombatChanceLowerLimit;
-            return chance.Clamp(r * BaselineTacticalSpeed);
+            return chance.ClampPotential(r * BaselineTacticalSpeed);
             // return MathF.Min(chance.Baseline, MathF.Min(chance.Potential, r * BaselineTacticalSpeed));
             // return r * BaselineTacticalSpeed;
         }
@@ -166,13 +160,14 @@ namespace YYZ.CombatGenerator
         bool DensityCheck(float minWidth) => NextFloat() <= (minWidth + DensityCheckSmoothConstant) / DensityEffectWidthUpperLimit;
         bool DeploymentCheck(float command) => NextFloat() <= CommandBase + command * CombatEffectCoef;
         bool SituationCheck(float situation) => NextFloat() <= situation / 2 + 0.5;
-        float JudgementNoise(CombatGroupWrapper group)
+        float JudgementNoise(CombatGroupWrapper group) // 10% ~ 100% ~ 1000%
         {
             var offset = JudgementReferneceLevel - group.Group.Judgement;
             // TODO: more symmeric noise to drive over-cautious or over-aggressive behaviour.
+            
             var coef = MathF.Max(0, JudgementBaseNoise + offset * JudgementNoiseCoef);
             var noise = NextFloat() * 2 - 1;
-            return 1 + coef * noise;
+            return MathF.Min(10, MathF.Max(0.1f, 1 + coef * noise));
         }
 
         CombatType RollCombatTypeDecision(CombatGroupWrapper group, float ratio)
@@ -185,6 +180,20 @@ namespace YYZ.CombatGenerator
             return CombatType.Assault;
         }
 
+        /*
+        bool IsContinue(CombatGroupWrapper attacker, CombatGroupWrapper defender)
+        {
+            var a0 = attacker.Chance.Baseline == 0;
+            var d0 = defender.Chance.Baseline == 0;
+            if (a0 && d0)
+                return false;
+            if (a0 || d0)
+                return true;
+        }
+        */
+
+        float RollPassiveAssetComsunptionCoef(CombatGroupWrapper group) => MathF.Max(0.1f, 1f - NextFloat() * CommandPassiveAssetComsuptionCoef * group.Group.Command);
+
 
         public IEnumerable<GeneratedCombat> Generate(ICombatGroup attackerGroup, ICombatGroup defenderGroup)
         {
@@ -192,14 +201,25 @@ namespace YYZ.CombatGenerator
             var attacker = new CombatGroupWrapper(attackerGroup, BaselineTacticalSpeed);
             var defender = new CombatGroupWrapper(defenderGroup, BaselineTacticalSpeed);
 
+            /*
             while(attacker.Chance.Potential / attacker.Chance.BeginPotential > ReservationPercent || 
                   defender.Chance.Potential / defender.Chance.BeginPotential > ReservationPercent)
+            */
+            // TODO: Give bonus to the side which still hold asset at hand while the opposite doesn't
+            while(attacker.Chance.Baseline > 0 && defender.Chance.Baseline > 0 && !attacker.Group.IsEmpty() && !defender.Group.IsEmpty())
             {
                 var ap = attacker.Chance.Potential;
                 var dp = defender.Chance.Potential;
+
+                // Console.WriteLine($"ap={ap}, dp={dp}, {attacker.Chance.Baseline}, {defender.Chance.Baseline}");
+
                 var attackerInitiative = NextFloat() < ap / (ap + dp);
 
                 (var active, var passive) = attackerInitiative ? (attacker, defender) : (defender, attacker);
+
+                var app = active.Chance.Baseline / passive.Chance.Baseline;
+                if (app * JudgementNoise(active) < ReservationPercent)
+                    continue;
 
                 var activeBeginChance = new ChanceSnapshot(active.Chance);
                 var passiveBeginChance = new ChanceSnapshot(passive.Chance);
@@ -210,7 +230,7 @@ namespace YYZ.CombatGenerator
                     continue;
                 
                 var minWidth = MathF.Min(active.TotalWidth(), passive.TotalWidth());
-                if(!DensityCheck(minWidth)) // Guerrila or low intensity maneuver warfare
+                if(!DensityCheck(minWidth)) // Guerrilla or low intensity maneuver warfare
                     continue;
 
                 if(!DeploymentCheck(active.Group.Command)) // Commander's ability to deploy troop on proper location
@@ -220,25 +240,30 @@ namespace YYZ.CombatGenerator
                     continue;
 
                 var passiveAsset = RollCombatAsset(passive.Chance);
-                passiveAsset = passive.Chance.Clamp((1 - PassiveCorrelation) * passiveAsset + PassiveCorrelation * activeAsset);
+                passiveAsset = passive.Chance.ClampBaseline((1 - PassiveCorrelation) * passiveAsset + PassiveCorrelation * activeAsset);
 
                 if(passiveAsset == 0)
                     yield break;
                 var ratio = activeAsset / passiveAsset; // Traditional CRT ratio
 
                 var combatType = RollCombatTypeDecision(active, ratio);
-                switch(combatType)
+                var passiveAssetCost = passiveAsset * RollPassiveAssetComsunptionCoef(passive);
+                switch (combatType)
                 {
                     case CombatType.Stand:
                         if(DeploymentCheck(active.Group.Command))
-                            passive.Chance.Baseline -= MathF.Min(passiveAsset, MathF.Max(activeAsset, passiveAsset / 2)); // partial divergent
+                            passive.Chance.Baseline -= MathF.Min(passiveAssetCost, MathF.Max(activeAsset, passiveAssetCost / 2)); // partial divergent
                         continue; // TODO: Explicitly model stand combat.
                     case CombatType.Fire:
                     case CombatType.Assault:
-                        passive.Chance.Baseline -= passiveAsset;
+                        passive.Chance.Baseline -= passiveAssetCost;
 
                         var ad = MakeGroupDispatchCommand(activeAsset, active, activeBeginChance);
                         var pd = MakeGroupDispatchCommand(passiveAsset, passive, passiveBeginChance);
+
+                        if(ad.Units.Sum(u => u.Strength) == 0 || pd.Units.Sum(u => u.Strength) == 0)
+                            continue; // TODO: Add extra penalty to the side who can't even resistent. 
+
                         (var attackDispatch, var defenderDispatch) = attackerInitiative ? (ad, pd) : (pd, ad);
                         yield return new GeneratedCombat()
                         {

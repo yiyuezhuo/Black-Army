@@ -127,8 +127,8 @@ namespace YYZ.BlackArmy.CombatResolution
         (YYZ.CombatResolution.ConmbatSide, List<UnitCommitted>) ApplyCommand(CombatGenerator.CombatGroupDispatchCommand groupCommand, IEnumerable<Unit> units)
         {
             var unitsCommited = groupCommand.Units.Zip(units, (command, unit) => new UnitCommitted(unit, command.Strength)).ToList();
-            var manpower = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength);
-            var morale = unitsCommited.Sum(u => u.Unit.Type.Manpower * u.Strength * u.Unit.Type.Morale) / manpower; // TODO: 0 issue
+            var totalWidth = unitsCommited.Sum(u => u.Unit.Type.Width * u.Strength);
+            var morale = unitsCommited.Sum(u => u.Unit.Type.Width * u.Strength * u.Unit.Type.Morale) / totalWidth; // TODO: 0 issue
             var combatSide = new YYZ.CombatResolution.ConmbatSide(){Units=unitsCommited, Morale=morale};
             return (combatSide, unitsCommited);
         }
@@ -170,7 +170,7 @@ namespace YYZ.BlackArmy.CombatResolution
 
         float GetSituationDelta(CombatGroup group, List<UnitCommitted> unitCommited, CombatResultSummary summary, bool isActive)
         {
-            var p = unitCommited.Sum(u => u.Lost * u.Unit.Width) / unitCommited.Sum(u => u.Unit.Strength * u.Unit.Width);
+            var p = unitCommited.Sum(u => u.Lost * u.Unit.Width) / unitCommited.Sum(u => (u.Unit.Strength + u.Lost) * u.Unit.Width);
             var coef = isActive ? summary.AttackerSituationEffect : summary.DefenderSituationEffect;
             var delta = -p * SituationBaseCoef * coef;
             // group.Situation += delta;
@@ -224,6 +224,9 @@ namespace YYZ.BlackArmy.CombatResolution
 
                 var aDelta = asDelta - dsDelta;
                 var dDelta = dsDelta - asDelta;
+
+                aDelta = MathF.Max(-1 - AttackerGroup.Situation, MathF.Min(aDelta, 1 - AttackerGroup.Situation));
+                dDelta = MathF.Max(-1 - DefenderGroup.Situation, MathF.Min(dDelta, 1 - DefenderGroup.Situation));
 
                 AttackerGroup.Situation += aDelta;
                 DefenderGroup.Situation += dDelta;

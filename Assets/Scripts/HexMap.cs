@@ -43,7 +43,7 @@ public class HexMap : MonoBehaviour
                     if(tilemap.GetTile(cellIdx) != null)
                     {
                         var hex = Provider.GetHex(cellIdx.x, cellIdx.y);
-                        Debug.Log($"downMousePosition={downMousePosition},Input.mousePosition={Input.mousePosition},hitPoint={hitPoint},cellIdx={cellIdx},hex={hex}");
+                        // Debug.Log($"downMousePosition={downMousePosition},Input.mousePosition={Input.mousePosition},hitPoint={hitPoint},cellIdx={cellIdx},hex={hex}");
                         hexRightClicked.Invoke(hex);
                     }
                 }

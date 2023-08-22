@@ -152,7 +152,16 @@ namespace YYZ.CombatResolution
         {
             var p = table.Draw();
             var postCombatValue = combatValue * p;
+
+            /*
+            if(unit.Defense == 0f) // TODO: remove the check once true cause is found
+                throw new ArgumentOutOfRangeException($"unit.Defense={unit.Defense}");
+            */
+
             var lossF = Math.Min(unit.Strength, postCombatValue / unit.Defense);
+            
+            // Console.WriteLine($"unit.Strength={unit.Strength}, postCombatValue={postCombatValue}, unit.Defense={unit.Defense}, lossF={lossF}");
+
             var loss = RandomRound(lossF);
             return new()
             {
@@ -228,6 +237,13 @@ namespace YYZ.CombatResolution
                 default:
                     throw new ArgumentException($"Unknown Mode: {setting.Mode}");
             }
+
+            /*
+            Console.WriteLine($"defCombatValue={defCombatValue}, atkCombatValue={atkCombatValue}, atkWeights={string.Join(",", atkWeights)}, defWeights={string.Join(",", defWeights)}");
+            if(float.IsNaN(atkWeights[0]))
+                Console.WriteLine("NaN");
+            */
+            
             var atkUpdates = attacker.CombatValueResolve(atkWeights, defCombatValue, AssaultLossTable).ToList();
             var defUpdates = defender.CombatValueResolve(defWeights, atkCombatValue, AssaultLossTable).ToList();
 

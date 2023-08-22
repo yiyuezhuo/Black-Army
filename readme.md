@@ -5,6 +5,7 @@ In November 1920, Nestor Makhno and its Anarchists troops, Black Army, is backst
 ## Screenshots:
 
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5NS5wbmc=/original/z%2FDlKP.png">
+<img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMzE5OTk5OC5wbmc=/original/9IVw6V.png">
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5Ni5wbmc=/original/z6zZ9C.png">
 <img src="https://img.itch.zone/aW1hZ2UvMjE5Nzg1MS8xMjk4OTE5NC5wbmc=/original/rU4BX4.png">
 
@@ -37,8 +38,11 @@ Currently, only navigation, basic movement & turn and re-orgnization are impleme
 
 - [x] Fix WebGL export (IL2CPP issue) and 3D view selection issue (canvas's event camera)
 - [x] Fix arrow shape and progression display issue due to shader. (Shader's Queue tag is not set to the expected "Transparent" used by other 2D renders).
-- [ ] Global tactical modifier driven combat resolution and UI binding
-- [ ] Animations of sub-turns resolving
+- [x] Global tactical modifier driven combat resolution and UI binding
+- [x] Animations of sub-turns resolving
+- [ ] Add tactic value effect and move speed modifier.
+- [ ] Add surrender when unit combat in bad situation.
+- [ ] Inconsistency handling for defensive chance/asset.
 - [ ] Simple Supply & Reforcement & Replacement
 - [ ] VP & Global morale effects on Anarchists (especially move speed and supply)
 - [ ] Simple AI

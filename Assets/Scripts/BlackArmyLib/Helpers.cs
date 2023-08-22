@@ -9,6 +9,8 @@ namespace YYZ
         public static float NextFloat() => (float)rng.NextDouble();
         public static int RandomRound(float x)
         {
+            if(x < 0)
+                throw new ArgumentOutOfRangeException($"{x}");
             var r = NextFloat() < (x % 1) ? 1 : 0;
             return (int)MathF.Floor(x) + r;
         }
